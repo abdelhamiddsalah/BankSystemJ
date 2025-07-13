@@ -16,7 +16,8 @@ public class AccountService {
     public AccountDto createAccount(AccountDto accountRequest) {
         AccountEntity entity = accountMapper.toEntity(accountRequest);
         entity.setAccountNumber(generateAccountNumber());
-        entity.setAccountType(accountRequest.getAccountType());
+        entity.setAccountType(AccountesTypes.fromValue(String.valueOf(accountRequest.getAccountType())));
+
         entity.setBalance(0.0);
         entity.setCreatedAt(TimeUtil.getCurrentTime());
 

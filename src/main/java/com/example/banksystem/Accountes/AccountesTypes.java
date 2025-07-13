@@ -5,9 +5,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum AccountesTypes {
     CURRENT("current"),
-    SAVINGS("savings"),
-    FOREIGN_CURRENCY("foreign_currency"),
-    CREDIT_CARD("credit_card");
+    ISLAMIC("islamic"),
+    DEPOSIT("deposit");
 
     private final String value;
 
