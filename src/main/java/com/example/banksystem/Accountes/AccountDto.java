@@ -1,5 +1,6 @@
 package com.example.banksystem.Accountes;
 
+import com.example.banksystem.Auth.UserEntity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;

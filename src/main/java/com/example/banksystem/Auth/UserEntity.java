@@ -1,11 +1,15 @@
 package com.example.banksystem.Auth;
+import com.example.banksystem.Accountes.AccountEntity;
 import com.example.banksystem.Common.Enums.Roles;
+import com.example.banksystem.Deposits.DepositEntity;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Entity
@@ -40,4 +44,12 @@ public class UserEntity  {
     private GenderEnums gender;
     @Column(name = "marital_status")
     private String  MaritalStatus;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private AccountEntity account;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DepositEntity> deposits;
+
 }

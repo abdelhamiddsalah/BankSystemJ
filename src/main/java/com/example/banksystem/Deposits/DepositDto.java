@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 public class DepositDto {
 
         private Long depositId;
-        private int amount;
+        private double amount;
         private String status;
         private LocalDateTime date;
         private Long userId;

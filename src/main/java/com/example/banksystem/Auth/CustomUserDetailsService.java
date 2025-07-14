@@ -1,7 +1,4 @@
 package com.example.banksystem.Auth;
-
-import com.example.banksystem.Auth.UserEntity;
-import com.example.banksystem.Auth.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

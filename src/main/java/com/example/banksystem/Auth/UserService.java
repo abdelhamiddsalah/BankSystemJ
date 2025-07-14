@@ -31,6 +31,14 @@ public class UserService {
         userEntity.setLastName(userDto.getLastName());
         userEntity.setEmail(userDto.getEmail());
         userEntity.setRole(userDto.getRole());
+        userEntity.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        userEntity.setDateOfBirth(userDto.getDateOfBirth());
+        userEntity.setMaritalStatus(userDto.getMaritalStatus());
+        userEntity.setGender(userDto.getGender());
+        userEntity.setAddress(userDto.getAddress());
+        userEntity.setPhoneNumber(userDto.getPhoneNumber());
+        userEntity.setNationalId(userDto.getNationalId());
+
 
         // تشفير الباسورد
         userEntity.setPassword(passwordEncoder.encode(userDto.getPassword()));

@@ -1,6 +1,7 @@
 package com.example.banksystem.Deposits;
 
 
+import com.example.banksystem.Accountes.AccountEntity;
 import com.example.banksystem.Auth.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -19,16 +20,25 @@ public class DepositEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long depositId;
 
-    private int amount;
+    private double amount;
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private UserEntity user;
+
 
     private LocalDateTime date;
 
     private String status;
 
     private String message;
+
+    @ManyToOne
+    @JoinColumn(name = "account_id", referencedColumnName = "id") // 👈 يفضل تحديد referencedColumnName
+    private AccountEntity account;
+
+
+
+
 
 }
