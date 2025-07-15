@@ -41,6 +41,18 @@ public class AccountService {
         return accountMapper.toDto(saved);
     }
 
+    public BalanceResponse getBalance() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String token = (String) authentication.getDetails();
+        Long userId = jwtService.extractId(token);
+
+        UserEntity user = userRepo.findById(userId).orElseThrow();
+        AccountEntity entity = accountsRepo.findByUserId(userId).orElseThrow();
+
+        return new BalanceResponse(entity.getBalance());
+    }
+
+
 
     private String generateAccountNumber() {
         return "EG" + (long)(Math.random() * 1_000_000_000L);
