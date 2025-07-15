@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class DepositDto {
 
-        private Long depositId;
+        private Long iidd;
         private double amount;
         private String status;
         private LocalDateTime date;

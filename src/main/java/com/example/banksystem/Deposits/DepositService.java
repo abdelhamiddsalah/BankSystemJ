@@ -30,41 +30,40 @@ public class DepositService {
     @Autowired
     private JwtService jwtService;
 
-    public DepositEntity CreateDeposit(DepositDto depositdto) {
-        // ✅ استخراج بيانات المصادقة
+    public DepositResponseDto CreateDeposit(DepositDto depositdto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String token = (String) authentication.getDetails();
         Long id = jwtService.extractId(token);
         String email = authentication.getName();
 
-        // ✅ جلب المستخدم
         UserEntity user = userRepo.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-
-
-        // ✅ جلب الحساب المرتبط بالمستخدم
         AccountEntity account = accountsRepo.findById(user.getAccount().getId())
                 .orElseThrow(() -> new RuntimeException("Account not found"));
 
-        // ✅ تحديث الرصيد
         double depositAmount = depositdto.getAmount();
         account.setBalance(account.getBalance() + depositAmount);
-
-        // ✅ حفظ التحديث في الحساب
         accountsRepo.save(account);
 
-        // ✅ إنشاء كيان الإيداع
-        DepositEntity depositEntity = depositMapper.depositentity(depositdto);
+        DepositEntity depositEntity = new DepositEntity();
         depositEntity.setAmount(depositAmount);
-        depositEntity.setDepositId(depositdto.getDepositId());
         depositEntity.setStatus("PENDING");
         depositEntity.setDate(LocalDateTime.now());
         depositEntity.setMessage("Deposited Successfully");
-
-        // ✅ ربط الإيداع بالمستخدم
         depositEntity.setUser(user);
+        depositEntity.setAccount(account);
 
-        return depositRepo.save(depositEntity);
+        DepositEntity saved = depositRepo.save(depositEntity);
+
+        return new DepositResponseDto(
+                saved.getDepositId(),
+                saved.getAmount(),
+                saved.getStatus(),
+                saved.getDate(),
+                saved.getUser().getId(),
+                saved.getMessage()
+        );
     }
+
 }

@@ -22,8 +22,9 @@ public class DepositController {
 
     @PostMapping("/createDeposit")
     @PreAuthorize("hasRole('USER')")
-    public DepositDto CreateDeposit(@RequestBody DepositDto depositdto) {
-        DepositEntity saved = depositService.CreateDeposit(depositdto);
-        return depositMapper.depositdto(saved);
+    public DepositResponseDto createDeposit(@RequestBody DepositDto depositdto) {
+        return depositService.CreateDeposit(depositdto); // ✅ كده تمام
     }
+
+
 }

@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Data
 @AllArgsConstructor
@@ -25,6 +27,11 @@ public class WithdrawEntity {
     @ManyToOne(fetch = FetchType.EAGER)
     private AccountEntity account;
 
+    private LocalDateTime date;
+
+    private String status;
+
+    private String message;
 
 
 }

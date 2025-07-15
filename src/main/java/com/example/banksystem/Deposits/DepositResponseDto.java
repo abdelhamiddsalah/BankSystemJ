@@ -1,4 +1,4 @@
-package com.example.banksystem.Withdraw;
+package com.example.banksystem.Deposits;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,14 +9,11 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class WithdrawResponseDto {
-    private double amount;
-    private Long userId;
+public class DepositResponseDto {
     private Long iidd;
-
-    private LocalDateTime date;
-
+    private double amount;
     private String status;
-
+    private LocalDateTime date;
+    private Long userId;
     private String message;
 }
