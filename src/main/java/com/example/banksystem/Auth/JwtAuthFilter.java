@@ -26,35 +26,36 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        // ✅ تجاهل المسارات المفتوحة
         String path = request.getServletPath();
-        if (path.equals("/api/register") || path.startsWith("/auth")) {
+        if (path.equals("/api/register") ||
+                path.startsWith("/auth") ||
+                path.startsWith("/swagger-ui") ||
+                path.startsWith("/v3/api-docs") || // ⬅️ مهم
+                path.startsWith("/swagger-resources") ||
+                path.equals("/swagger-ui.html") ||
+                path.startsWith("/webjars") ||
+                path.startsWith("/configuration")) {
+
             filterChain.doFilter(request, response);
             return;
         }
 
-        // ✅ استخراج الهيدر
+
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
         final String username;
 
-        // ✅ التأكد من وجود Bearer token
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // ✅ إزالة كلمة Bearer
         jwt = authHeader.substring(7);
-
-        // ✅ استخراج اسم المستخدم من التوكن
         username = jwtService.extractUsername(jwt);
 
-        // ✅ التحقق أن المستخدم لم يتم مصادقته بعد
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-            // ✅ التحقق من صحة التوكن
             if (jwtService.isTokenValid(jwt, userDetails)) {
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(
@@ -62,16 +63,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                 null,
                                 userDetails.getAuthorities()
                         );
-
-                // ✅ حفظ التوكن نفسه داخل details عشان نوصله لاحقًا
                 authToken.setDetails(jwt);
-
-                // ✅ تخزين المصادقة في SecurityContext
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
 
-        // ✅ مواصلة السلسلة
         filterChain.doFilter(request, response);
     }
 }
