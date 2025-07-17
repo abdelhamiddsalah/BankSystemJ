@@ -3,6 +3,7 @@ package com.example.banksystem.Auth;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.*;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -50,7 +51,10 @@ public class SecurityConfig {
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/employer/**").hasRole("EMPLOYER")
-                        .requestMatchers("/api/uploadpdf/**").hasRole("EMPLOYER")
+                        .requestMatchers("/api/uploadpdf/view/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/uploadpdf").hasRole("USER")
+                        .requestMatchers(HttpMethod.GET, "/api/uploadpdf").hasRole("EMPLOYER")
+
                         .requestMatchers("/api/uploadpdf/view/**").permitAll()
                         .anyRequest().authenticated()
                 )
