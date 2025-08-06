@@ -8,11 +8,11 @@ import org.mapstruct.Mapping;
 public interface AccountMapper {
 
 
- @Mapping(source = "accountType", target = "accountType")
+// @Mapping(source = "accountType", target = "accountType")
     AccountDto toDto(AccountEntity entity);
 
 
- @Mapping(source = "accountType", target = "accountType")
+ // @Mapping(source = "accountType", target = "accountType")
     AccountEntity toEntity(AccountDto dto);
 }
 

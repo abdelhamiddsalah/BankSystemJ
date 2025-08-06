@@ -32,7 +32,8 @@ public class CustomUserDetailsService implements UserDetailsService {
                     user.getId(),
                     user.getEmail(),
                     user.getPassword(),
-                    Collections.singletonList(authority)
+                    Collections.singletonList(authority),
+                    user.getEmployer().getId()
             );
         }
 
@@ -47,7 +48,8 @@ public class CustomUserDetailsService implements UserDetailsService {
                     employer.getId(),
                     employer.getEmail(),
                     employer.getPassword(),
-                    Collections.singletonList(authority)
+                    Collections.singletonList(authority),
+                    employer.getId()
             );
         }
 

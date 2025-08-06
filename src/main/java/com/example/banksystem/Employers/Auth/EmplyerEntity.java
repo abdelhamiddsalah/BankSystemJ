@@ -3,6 +3,7 @@ package com.example.banksystem.Employers.Auth;
 
 import com.example.banksystem.Auth.AddressEntity;
 import com.example.banksystem.Auth.GenderEnums;
+import com.example.banksystem.Auth.UserEntity;
 import com.example.banksystem.Common.Enums.Roles;
 import com.example.banksystem.Employers.Pdfs.PdfFileEntity;
 import jakarta.persistence.*;
@@ -47,6 +48,8 @@ public class EmplyerEntity {
     @OneToMany(mappedBy = "employer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PdfFileEntity> pdfFile;
 
+    @OneToMany(mappedBy = "employer", cascade = CascadeType.ALL)
+    private List<UserEntity> users;
 
 
 }

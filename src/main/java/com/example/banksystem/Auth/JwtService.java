@@ -29,13 +29,15 @@ public class JwtService {
 
         return Jwts.builder()
                 .setSubject(customUser.getUsername())
-                .claim("id", customUser.getId())
+                .claim("id", customUser.getId()) // userId
                 .claim("roles", customUser.getAuthorities())
+                .claim("employerId", customUser.getEmployerId()) // ✅ هنا الإضافة الجديدة
                 .setIssuedAt(new Date())
                 .setExpiration(Date.from(Instant.now().plus(1, ChronoUnit.DAYS)))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
+
 
 
     public String extractUsername(String token) {
@@ -56,6 +58,16 @@ public class JwtService {
                 .get("id", Long.class);
     }
 
+    public Long extractEmployerId(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(getSignInKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("employerId", Long.class);
+    }
+
+
     public boolean isTokenValid(String token, UserDetails userDetails) {
         return extractUsername(token).equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
@@ -69,4 +81,6 @@ public class JwtService {
                 .getExpiration();
         return expiration.before(new Date());
     }
+
+
 }

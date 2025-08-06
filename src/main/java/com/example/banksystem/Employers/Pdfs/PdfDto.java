@@ -1,5 +1,6 @@
 package com.example.banksystem.Employers.Pdfs;
 
+import com.example.banksystem.Employers.Auth.EmplyerEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,4 +16,6 @@ public class PdfDto {
 
     private String contentType;
     private String viewUrl;
+
+    private String employerid;
 }

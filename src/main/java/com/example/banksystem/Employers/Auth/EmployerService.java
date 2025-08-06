@@ -42,7 +42,8 @@ public class EmployerService {
                 savedEmp.getId(),
                 savedEmp.getEmail(),
                 savedEmp.getPassword(),
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + savedEmp.getRole().name()))
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + savedEmp.getRole().name())),
+                savedEmp.getId()
         );
 
 

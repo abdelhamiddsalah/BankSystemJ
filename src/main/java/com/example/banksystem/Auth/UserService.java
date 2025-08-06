@@ -1,5 +1,7 @@
 package com.example.banksystem.Auth;
 
+import com.example.banksystem.Employers.Auth.EmployerRepo;
+import com.example.banksystem.Employers.Auth.EmplyerEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,13 +21,14 @@ public class UserService {
     private final UserRepo userRepo;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final EmployerRepo employerRepo;
 
     public AuthResponse createUser(UserDto userDto) {
 
         if (userRepo.findByEmail(userDto.getEmail()).isPresent()) {
             throw new ResponseStatusException(HttpStatus.FOUND, "User already exists with this email.");
         }
-        // تحويل من DTO إلى Entity
+
         UserEntity userEntity = new UserEntity();
         userEntity.setFirstName(userDto.getFirstName());
         userEntity.setLastName(userDto.getLastName());
@@ -39,27 +42,27 @@ public class UserService {
         userEntity.setPhoneNumber(userDto.getPhoneNumber());
         userEntity.setNationalId(userDto.getNationalId());
 
+        if (userDto.getEmplyerid() != null) {
+            EmplyerEntity employer = employerRepo.findById(userDto.getEmplyerid())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Employer not found."));
+            userEntity.setEmployer(employer);
+        }
 
-        // تشفير الباسورد
-        userEntity.setPassword(passwordEncoder.encode(userDto.getPassword()));
 
         // حفظ المستخدم
         UserEntity savedUser = userRepo.save(userEntity);
-
-
-        // بناء UserDetails لتوليد التوكن
         UserDetails userDetails = new CustomUserDetails(
                 savedUser.getId(),
                 savedUser.getEmail(),
                 savedUser.getPassword(),
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + savedUser.getRole().name()))
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + savedUser.getRole().name())),
+                savedUser.getEmployer() != null ? savedUser.getEmployer().getId() : null // ✅ الجديد
         );
 
 
-        // توليد التوكن
         String token = jwtService.generateToken(userDetails);
 
-        // رجّع التوكن في response
-        return new AuthResponse(token,  savedUser.getRole().name());
+        return new AuthResponse(token, savedUser.getRole().name());
     }
+
 }

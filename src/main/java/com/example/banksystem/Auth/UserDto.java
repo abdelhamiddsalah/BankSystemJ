@@ -1,6 +1,7 @@
 package com.example.banksystem.Auth;
 
 import com.example.banksystem.Common.Enums.Roles;
+import com.example.banksystem.Employers.Auth.EmplyerEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.EnumType;
@@ -28,4 +29,5 @@ public class UserDto {
     @Enumerated(EnumType.STRING)
     private GenderEnums gender;
     private String  MaritalStatus;
+    private Long emplyerid;
 }
