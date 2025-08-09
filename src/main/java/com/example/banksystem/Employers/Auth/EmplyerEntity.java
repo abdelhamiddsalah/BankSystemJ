@@ -51,5 +51,6 @@ public class EmplyerEntity {
     @OneToMany(mappedBy = "employer", cascade = CascadeType.ALL)
     private List<UserEntity> users;
 
+    private String pincode;
 
 }

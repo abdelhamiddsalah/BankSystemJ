@@ -17,4 +17,10 @@ public class UserController {
     public AuthResponse createUser(@RequestBody UserDto userDto) {
         return userService.createUser(userDto);
     }
+
+    @PostMapping("/login")
+    public AuthResponse login(@RequestBody UserDto userDto) {
+        return userService.loginWithPin(userDto);
+    }
 }
+

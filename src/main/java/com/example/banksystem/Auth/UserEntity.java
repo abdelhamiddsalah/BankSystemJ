@@ -26,7 +26,7 @@ public class UserEntity  {
     private String firstName;
     @Column(name = "last_name")
     private String lastName;
-    @Column(name = "email")
+    @Column(name = "email", unique = true)
     private String email;
     @Column(name = "role")
     private Roles role;
@@ -38,6 +38,8 @@ public class UserEntity  {
     private String nationalId;
     @Column(name = "date_of_birth")
     private Date dateOfBirth;
+    @Column(name = "pin_code")
+    private String pinCode;
     @Embedded
     private AddressEntity address;
     @Enumerated(EnumType.STRING)
@@ -46,6 +48,10 @@ public class UserEntity  {
     @Column(name = "marital_status")
     private String  MaritalStatus;
 
+    @ManyToOne
+    @JoinColumn(name = "employer_id")
+    private EmplyerEntity employer;
+
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private AccountEntity account;
@@ -53,9 +59,7 @@ public class UserEntity  {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DepositEntity> deposits;
 
-    @ManyToOne
-    @JoinColumn(name = "employer_id")
-    private EmplyerEntity employer;
+
 
 
 }

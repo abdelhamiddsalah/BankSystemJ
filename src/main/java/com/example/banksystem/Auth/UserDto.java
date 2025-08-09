@@ -24,10 +24,13 @@ public class UserDto {
     private String phoneNumber;
     private String nationalId;
     private Date dateOfBirth;
+    private String pinCode;
     @Embedded
     private AddressEntity address;
     @Enumerated(EnumType.STRING)
     private GenderEnums gender;
     private String  MaritalStatus;
     private Long emplyerid;
+
+
 }

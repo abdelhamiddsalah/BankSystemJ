@@ -1,5 +1,6 @@
 package com.example.banksystem.Auth;
 
+import com.example.banksystem.Common.Enums.Roles;
 import com.example.banksystem.Employers.Auth.EmployerRepo;
 import com.example.banksystem.Employers.Auth.EmplyerEntity;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final EmployerRepo employerRepo;
+    private final UserMapper userMapper;
 
     public AuthResponse createUser(UserDto userDto) {
 
@@ -29,40 +31,73 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.FOUND, "User already exists with this email.");
         }
 
+        // التحويل الصحيح من DTO إلى Entity
         UserEntity userEntity = new UserEntity();
+        userEntity.setEmail(userDto.getEmail());
+        userEntity.setPassword(passwordEncoder.encode(userDto.getPassword()));
         userEntity.setFirstName(userDto.getFirstName());
         userEntity.setLastName(userDto.getLastName());
-        userEntity.setEmail(userDto.getEmail());
-        userEntity.setRole(userDto.getRole());
-        userEntity.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        userEntity.setDateOfBirth(userDto.getDateOfBirth());
-        userEntity.setMaritalStatus(userDto.getMaritalStatus());
-        userEntity.setGender(userDto.getGender());
-        userEntity.setAddress(userDto.getAddress());
+        userEntity.setRole(Roles.USER);
         userEntity.setPhoneNumber(userDto.getPhoneNumber());
         userEntity.setNationalId(userDto.getNationalId());
+        userEntity.setDateOfBirth(userDto.getDateOfBirth());
+        userEntity.setPinCode(passwordEncoder.encode(userDto.getPinCode()));
+        userEntity.setAddress(userDto.getAddress());
+        userEntity.setMaritalStatus(userDto.getMaritalStatus());
+        userEntity.setGender(userDto.getGender());
 
+        // تعيين role افتراضي إذا ما جاش من الـ DTO
+        if (userEntity.getRole() == null) {
+            userEntity.setRole(Roles.USER);
+        }
+
+        // ربط الـ Employer إذا موجود
         if (userDto.getEmplyerid() != null) {
             EmplyerEntity employer = employerRepo.findById(userDto.getEmplyerid())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Employer not found."));
             userEntity.setEmployer(employer);
         }
 
-
-        // حفظ المستخدم
+        // الحفظ
         UserEntity savedUser = userRepo.save(userEntity);
+
         UserDetails userDetails = new CustomUserDetails(
                 savedUser.getId(),
                 savedUser.getEmail(),
                 savedUser.getPassword(),
                 Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + savedUser.getRole().name())),
-                savedUser.getEmployer() != null ? savedUser.getEmployer().getId() : null // ✅ الجديد
+                savedUser.getEmployer() != null ? savedUser.getEmployer().getId() : null,
+                savedUser.getPinCode()
         );
 
-
         String token = jwtService.generateToken(userDetails);
-
         return new AuthResponse(token, savedUser.getRole().name());
     }
+
+
+    public AuthResponse loginWithPin(UserDto userDto) {
+        // 1. نبحث بالمُعرّف (إيميل أو هاتف)
+        UserEntity user = userRepo.findByEmail(userDto.getEmail())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        // 2. نتحقق من الـ PIN
+        if (!passwordEncoder.matches(userDto.getPinCode(), user.getPinCode())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid PIN");
+        }
+
+        // 3. توليد الـ JWT
+        UserDetails userDetails = new CustomUserDetails(
+                user.getId(),
+                user.getEmail(),
+                user.getPassword(),
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole().name())),
+                user.getEmployer() != null ? user.getEmployer().getId() : null,
+                user.getPinCode()
+        );
+
+        String token = jwtService.generateToken(userDetails);
+        return new AuthResponse(token, user.getRole().name());
+    }
+
 
 }

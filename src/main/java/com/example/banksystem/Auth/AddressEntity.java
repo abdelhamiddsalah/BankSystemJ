@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Embeddable
 @NoArgsConstructor
 public class AddressEntity {
+
     private String city;
     private String ZipCode;
 }

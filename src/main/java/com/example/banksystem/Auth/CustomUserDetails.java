@@ -12,13 +12,16 @@ public class CustomUserDetails implements UserDetails {
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
     private Long employerId;
+    private String pincode;
 
-    public CustomUserDetails(Long id, String username, String password, Collection<? extends GrantedAuthority> authorities,Long employerId) {
+    public CustomUserDetails(Long id, String username, String password,
+                             Collection<? extends GrantedAuthority> authorities,Long employerId,String pincode) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.authorities = authorities;
         this.employerId = employerId;
+        this.pincode = pincode;
     }
 
     public Long getId() {
@@ -31,6 +34,10 @@ public class CustomUserDetails implements UserDetails {
 
     public void setEmployerId(Long employerId) {
         this.employerId = employerId;
+    }
+
+    public String getPincode() {
+        return pincode;
     }
 
     @Override public String getUsername() { return username; }

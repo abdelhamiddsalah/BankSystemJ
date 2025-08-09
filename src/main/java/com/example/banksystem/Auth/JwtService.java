@@ -39,7 +39,6 @@ public class JwtService {
     }
 
 
-
     public String extractUsername(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSignInKey())
