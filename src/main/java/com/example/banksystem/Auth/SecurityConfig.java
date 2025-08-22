@@ -28,8 +28,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable())
+        http.csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
@@ -39,11 +38,6 @@ public class SecurityConfig {
                                 "/Categories",
                                 "/icons/**",
                                 "/api/employee/signup",
-                                // ⬅️ السماح بمسارات Swagger كاملة
-                                "/v3/api-docs/**",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/swagger-resources/**",
                                 "/configuration/ui",
                                 "/configuration/security",
                                 "/webjars/**"
@@ -55,7 +49,6 @@ public class SecurityConfig {
                         .requestMatchers("/api/uploadpdf/view/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/uploadpdf").hasRole("USER")
                         .requestMatchers(HttpMethod.GET, "/api/uploadpdf").hasRole("EMPLOYER")
-
                         .requestMatchers("/api/uploadpdf/view/**").permitAll()
                         .anyRequest().authenticated()
                 )

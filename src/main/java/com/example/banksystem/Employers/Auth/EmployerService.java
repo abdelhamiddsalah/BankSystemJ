@@ -43,7 +43,7 @@ public class EmployerService {
                 savedEmp.getEmail(),
                 savedEmp.getPassword(),
                 Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + savedEmp.getRole().name())),
-                savedEmp.getId(),
+               // savedEmp.getId(),
                 savedEmp.getPincode()
         );
 

@@ -29,6 +29,7 @@ public class UserEntity  {
     @Column(name = "email", unique = true)
     private String email;
     @Column(name = "role")
+    @Enumerated(EnumType.STRING)
     private Roles role;
     @Column(name = "password")
     private String password;
@@ -46,10 +47,10 @@ public class UserEntity  {
     @Column(name = "gender")
     private GenderEnums gender;
     @Column(name = "marital_status")
-    private String  MaritalStatus;
+    private String maritalStatus;
 
     @ManyToOne
-    @JoinColumn(name = "employer_id")
+   @JoinColumn(name = "employer_id")
     private EmplyerEntity employer;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)

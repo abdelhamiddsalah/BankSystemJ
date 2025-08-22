@@ -30,35 +30,12 @@ public class UserService {
         if (userRepo.findByEmail(userDto.getEmail()).isPresent()) {
             throw new ResponseStatusException(HttpStatus.FOUND, "User already exists with this email.");
         }
+        UserEntity userEntity = userMapper.toEntity(userDto);
 
-        // التحويل الصحيح من DTO إلى Entity
-        UserEntity userEntity = new UserEntity();
-        userEntity.setEmail(userDto.getEmail());
-        userEntity.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        userEntity.setFirstName(userDto.getFirstName());
-        userEntity.setLastName(userDto.getLastName());
-        userEntity.setRole(Roles.USER);
-        userEntity.setPhoneNumber(userDto.getPhoneNumber());
-        userEntity.setNationalId(userDto.getNationalId());
-        userEntity.setDateOfBirth(userDto.getDateOfBirth());
-        userEntity.setPinCode(passwordEncoder.encode(userDto.getPinCode()));
-        userEntity.setAddress(userDto.getAddress());
-        userEntity.setMaritalStatus(userDto.getMaritalStatus());
-        userEntity.setGender(userDto.getGender());
-
-        // تعيين role افتراضي إذا ما جاش من الـ DTO
         if (userEntity.getRole() == null) {
             userEntity.setRole(Roles.USER);
         }
 
-        // ربط الـ Employer إذا موجود
-        if (userDto.getEmplyerid() != null) {
-            EmplyerEntity employer = employerRepo.findById(userDto.getEmplyerid())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Employer not found."));
-            userEntity.setEmployer(employer);
-        }
-
-        // الحفظ
         UserEntity savedUser = userRepo.save(userEntity);
 
         UserDetails userDetails = new CustomUserDetails(
@@ -66,10 +43,8 @@ public class UserService {
                 savedUser.getEmail(),
                 savedUser.getPassword(),
                 Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + savedUser.getRole().name())),
-                savedUser.getEmployer() != null ? savedUser.getEmployer().getId() : null,
                 savedUser.getPinCode()
         );
-
         String token = jwtService.generateToken(userDetails);
         return new AuthResponse(token, savedUser.getRole().name());
     }
@@ -91,7 +66,7 @@ public class UserService {
                 user.getEmail(),
                 user.getPassword(),
                 Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole().name())),
-                user.getEmployer() != null ? user.getEmployer().getId() : null,
+            //    user.getEmployer() != null ? user.getEmployer().getId() : null,
                 user.getPinCode()
         );
 

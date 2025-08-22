@@ -25,12 +25,8 @@ public class UserDto {
     private String nationalId;
     private Date dateOfBirth;
     private String pinCode;
-    @Embedded
-    private AddressEntity address;
-    @Enumerated(EnumType.STRING)
-    private GenderEnums gender;
-    private String  MaritalStatus;
-    private Long emplyerid;
-
-
+    private AddressEntity address;   // من غير @Embedded
+    private GenderEnums gender;      // من غير @Enumerated
+    private String maritalStatus;    // خليه small camel case
+    private Long employerId;         // خليه مكتوب صح
 }

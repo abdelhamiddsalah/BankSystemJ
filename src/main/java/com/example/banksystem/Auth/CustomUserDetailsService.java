@@ -33,7 +33,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                     user.getEmail(),
                     user.getPassword(),
                     Collections.singletonList(authority),
-                    user.getEmployer().getId(),
+                 //   user.getEmployer().getId(),
                     user.getPinCode()
             );
         }
@@ -50,7 +50,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                     employer.getEmail(),
                     employer.getPassword(),
                     Collections.singletonList(authority),
-                    employer.getId(),
+                    //employer.getId(),
                     employer.getPincode()
             );
         }

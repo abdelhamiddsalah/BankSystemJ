@@ -31,7 +31,7 @@ public class JwtService {
                 .setSubject(customUser.getUsername())
                 .claim("id", customUser.getId()) // userId
                 .claim("roles", customUser.getAuthorities())
-                .claim("employerId", customUser.getEmployerId()) // ✅ هنا الإضافة الجديدة
+               // .claim("employerId", customUser.getEmployerId()) // ✅ هنا الإضافة الجديدة
                 .setIssuedAt(new Date())
                 .setExpiration(Date.from(Instant.now().plus(1, ChronoUnit.DAYS)))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
