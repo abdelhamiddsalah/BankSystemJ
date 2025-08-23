@@ -1,6 +1,7 @@
 package com.example.banksystem.Auth;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +22,11 @@ public class UserController {
     @PostMapping("/login")
     public AuthResponse login(@RequestBody UserDto userDto) {
         return userService.loginWithPin(userDto);
+    }
+
+    @PostMapping("/forgetpincode")
+    public ResponseEntity<String> forgetPin(@RequestBody NewPincode request) {
+        return ResponseEntity.ok(userService.forgetPinCode(request));
     }
 }
 

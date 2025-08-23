@@ -34,6 +34,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/auth/**",
                                 "/api/register",
+                                "api/forgetpincode",
                                 "/api/login",
                                 "/Categories",
                                 "/icons/**",

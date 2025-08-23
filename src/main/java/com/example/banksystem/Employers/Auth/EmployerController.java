@@ -16,4 +16,9 @@ public class EmployerController {
     public EmployerAuthResponse signup(@RequestBody EmployerDto employerDto) {
         return employerService.sinup(employerDto);
     }
+
+    @PostMapping
+    public EmployerAuthResponse login(@RequestBody EmployerDto employerDto) {
+        return employerService.login(employerDto);
+    }
 }

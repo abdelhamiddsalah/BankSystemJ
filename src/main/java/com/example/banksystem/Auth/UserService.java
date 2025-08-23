@@ -14,6 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
+import java.util.Optional;
+
+import static org.springframework.boot.autoconfigure.container.ContainerImageMetadata.isPresent;
 
 @Service
 @RequiredArgsConstructor
@@ -72,6 +75,22 @@ public class UserService {
 
         String token = jwtService.generateToken(userDetails);
         return new AuthResponse(token, user.getRole().name());
+    }
+
+    public String forgetPinCode(NewPincode request) {
+        UserEntity user = userRepo.findByEmail(request.getEmail())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        if (request.getNewPinCode() == null || request.getNewPinCode().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "New PIN code cannot be empty");
+        }
+
+        // تشفير الـ PIN الجديد
+        user.setPinCode(passwordEncoder.encode(request.getNewPinCode()));
+
+        userRepo.save(user);
+
+        return "Changed PIN code successfully";
     }
 
 

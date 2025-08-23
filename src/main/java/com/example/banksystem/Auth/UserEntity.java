@@ -50,7 +50,7 @@ public class UserEntity  {
     private String maritalStatus;
 
     @ManyToOne
-   @JoinColumn(name = "employer_id")
+    @JoinColumn(name = "employer_id")
     private EmplyerEntity employer;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -16,13 +16,13 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EmployerDto {
+    private Long id;
     private String firstName;
     private String lastName;
     private String email;
     private String password;
     private String phoneNumber;
     private String nationalID;
-    @Embedded
     private AddressEntity address;
     private Date dateOfBirth;
     private String emplyeeID;
@@ -31,9 +31,7 @@ public class EmployerDto {
     private Date dateOfhiring;
     private String WorkBranch;
     private String MaterialStatus;
-    @Enumerated(EnumType.STRING)
     private GenderEnums Gender;
-
-    @Enumerated(EnumType.STRING)
     private Roles role;
+    private String pincode;
 }
