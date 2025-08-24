@@ -7,17 +7,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/employee/signup")
+@RequestMapping("/api/employee/")
 public class EmployerController {
     @Autowired
     private EmployerService employerService;
 
-    @PostMapping
+    @PostMapping("signup")
     public EmployerAuthResponse signup(@RequestBody EmployerDto employerDto) {
         return employerService.sinup(employerDto);
     }
 
-    @PostMapping
+    @PostMapping("login")
     public EmployerAuthResponse login(@RequestBody EmployerDto employerDto) {
         return employerService.login(employerDto);
     }

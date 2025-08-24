@@ -30,6 +30,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if (path.equals("/api/register") ||
                 path.equals("/api/login") ||
                 path.equals("/forgetpincode") ||
+                path.equals("/api/registerAdmin") ||
                 path.startsWith("/auth") ||
                 path.startsWith("/webjars") ||
                 path.startsWith("/configuration")) {

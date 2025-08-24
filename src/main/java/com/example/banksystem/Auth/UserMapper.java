@@ -15,7 +15,7 @@ public abstract class UserMapper {
     @Autowired
     protected EmployerRepo employerRepo;
 
-    @Mapping(target = "employer", source = "employerId") // نحول من id إلى entity
+    //@Mapping(target = "employer", source = "employerId") // نحول من id إلى entity
     public abstract UserEntity toEntity(UserDto userDto);
 
     public abstract UserDto toDto(UserEntity userEntity);

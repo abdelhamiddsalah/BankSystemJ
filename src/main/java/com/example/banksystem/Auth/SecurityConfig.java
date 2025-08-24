@@ -35,6 +35,7 @@ public class SecurityConfig {
                                 "/auth/**",
                                 "/api/register",
                                 "api/forgetpincode",
+                                "api/registerAdmin",
                                 "/api/login",
                                 "/Categories",
                                 "/icons/**",

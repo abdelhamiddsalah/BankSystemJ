@@ -9,8 +9,14 @@ import java.util.List;
 @Service
 public class AdminService {
     @Autowired
- private    AdminRepo adminRepo;
-    List<UserEntity> getAllUsers(){
-        return adminRepo.findAll();
+    private AdminRepo adminRepo;
+
+    public String registerAsAdmin(AdminEntity adminEntity) {
+        if ("admin11@gmail.com".equals(adminEntity.getEmail()) &&
+                "adminadmin".equals(adminEntity.getPassword())) {
+            return "success";
+        }
+        return "fail";
     }
 }
+

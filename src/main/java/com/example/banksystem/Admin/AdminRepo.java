@@ -3,5 +3,5 @@ package com.example.banksystem.Admin;
 import com.example.banksystem.Auth.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface AdminRepo extends JpaRepository<UserEntity,Long> {
+public interface AdminRepo extends JpaRepository<AdminEntity,Long> {
 }
