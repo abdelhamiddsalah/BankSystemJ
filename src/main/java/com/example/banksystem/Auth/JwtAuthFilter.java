@@ -31,6 +31,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 path.equals("/api/login") ||
                 path.equals("/forgetpincode") ||
                 path.equals("/api/registerAdmin") ||
+                path.equals("/api/employee/signup") ||
+                path.equals("/api/employee/login") ||
+                path.equals("/api/addcopoun") ||
+                path.equals("/api/admin/cvs") ||
+                path.equals("/api/admin/cv/{id}/update") ||
+                path.equals("/api/uploadpdf/upload-cv") ||
+                path.equals("/api/admin/allUsers") ||
                 path.startsWith("/auth") ||
                 path.startsWith("/webjars") ||
                 path.startsWith("/configuration")) {

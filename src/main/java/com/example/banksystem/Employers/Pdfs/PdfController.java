@@ -9,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/uploadpdf")
+@RequestMapping("/api")
 public class PdfController {
 
     @Autowired
@@ -43,5 +43,33 @@ public class PdfController {
                 .body(pdf.getData());
     }
 
+    @PostMapping("/upload-cv")
+    public String uploadCV(@RequestParam("file") MultipartFile file) throws Exception {
+        return pdfService.uploadCV(file);
+    }
+
+
+    @GetMapping("/admin/cvs")
+    public List<CVEntity> getAllCVs() {
+        return pdfService.getAllCVs();
+    }
+
+    // عرض CV معين
+    @GetMapping("/cv/{id}")
+    public CVEntity getCV(@PathVariable Long id) {
+        return pdfService.getCVById(id);
+    }
+
+    @PutMapping("/admin/cv/{id}/update")
+    public CVEntity updateCVResult(@PathVariable Long id, @RequestParam String result) {
+        // Normalize value
+        String status = result.trim().toLowerCase();
+
+        if (!status.equals("approved") && !status.equals("rejected")) {
+            status = "waiting"; // القيمة الافتراضية
+        }
+
+        return pdfService.updateCVResult(id, status);
+    }
 
 }

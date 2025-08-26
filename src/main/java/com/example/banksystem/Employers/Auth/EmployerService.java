@@ -21,22 +21,14 @@ public class EmployerService {
     private JwtService jwtService;
     @Autowired
      private  PasswordEncoder passwordEncoder;
+    @Autowired
+    private EmployerMapper  employerMapper;
 
     public EmployerAuthResponse sinup(EmployerDto employerDto) {
-        EmplyerEntity emplyerEntity = new EmplyerEntity();
-        emplyerEntity.setFirstName(employerDto.getFirstName());
-        emplyerEntity.setLastName(employerDto.getLastName());
-        emplyerEntity.setEmail(employerDto.getEmail());
-        emplyerEntity.setPassword(passwordEncoder.encode(employerDto.getPassword()));
-        emplyerEntity.setAddress(employerDto.getAddress());
-        emplyerEntity.setRole(employerDto.getRole());
-        emplyerEntity.setDateOfBirth(employerDto.getDateOfBirth());
-        emplyerEntity.setGender(employerDto.getGender());
-        emplyerEntity.setEmplyeeID(employerDto.getEmplyeeID());
-        emplyerEntity.setDepartment(employerDto.getDepartment());
-        emplyerEntity.setDateOfhiring(employerDto.getDateOfhiring());
-        emplyerEntity.setJobTitle(employerDto.getJobTitle());
-        emplyerEntity.setWorkBranch(employerDto.getWorkBranch());
+        if (employerRepo.findByEmail(employerDto.getEmail()).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.FOUND, "Employee already exists with this email.");
+        }
+      EmplyerEntity emplyerEntity = employerMapper.emplyerEntity(employerDto);
 
         EmplyerEntity savedEmp= employerRepo.save(emplyerEntity);
 
@@ -49,8 +41,6 @@ public class EmployerService {
                // savedEmp.getId(),
                 savedEmp.getPincode()
         );
-
-
         // توليد التوكن
         String token = jwtService.generateToken(userDetails);
 

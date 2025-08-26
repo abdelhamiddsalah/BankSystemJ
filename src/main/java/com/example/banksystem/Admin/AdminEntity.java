@@ -18,5 +18,5 @@ public class AdminEntity {
     @Id
     private Long id;
 
-
+    private String result;
 }
