@@ -20,6 +20,7 @@ public class CopounsService {
         List<CopounEntity> oldCoupons = copounRepository.findAll();
         for (CopounEntity oldCoupon : oldCoupons) {
             oldCoupon.setExpired(true);
+            oldCoupon.setUsed(true);
         }
         copounRepository.saveAll(oldCoupons);
 

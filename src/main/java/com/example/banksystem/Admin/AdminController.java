@@ -1,7 +1,9 @@
 package com.example.banksystem.Admin;
 
 import com.example.banksystem.Auth.UserEntity;
+import com.example.banksystem.Employers.Auth.EmplyerEntity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,5 +22,20 @@ public class AdminController {
     @GetMapping("/admin/allUsers")
     public List<UserEntity> getAllUsers(){
       return   adminService.getAllusers();
+    }
+
+    @GetMapping("/admin/allEmployers")
+    public ResponseEntity<List<EmplyerEntity>> getAllEmployers(){
+        return   adminService.getAllEmplyers();
+    }
+
+    @DeleteMapping("/admin/employer/{id}")
+    public String deleteEmployer(@PathVariable Long id){
+        return adminService.deleteEmplyer(id);
+    }
+
+    @DeleteMapping("/admin/user/{id}")
+    public String deleteUser(@PathVariable Long id){
+        return adminService.deleteUser(id);
     }
 }

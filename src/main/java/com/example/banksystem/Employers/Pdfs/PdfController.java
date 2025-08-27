@@ -61,7 +61,11 @@ public class PdfController {
     }
 
     @PutMapping("/admin/cv/{id}/update")
-    public CVEntity updateCVResult(@PathVariable Long id, @RequestParam String result) {
+    public CVEntity updateCVResult(
+            @PathVariable Long id,
+            @RequestParam String result,
+            @RequestParam(required = false) String copoun // اختياري
+    ) {
         // Normalize value
         String status = result.trim().toLowerCase();
 
@@ -69,7 +73,8 @@ public class PdfController {
             status = "waiting"; // القيمة الافتراضية
         }
 
-        return pdfService.updateCVResult(id, status);
+        return pdfService.updateCVResult(id, status, copoun);
     }
+
 
 }

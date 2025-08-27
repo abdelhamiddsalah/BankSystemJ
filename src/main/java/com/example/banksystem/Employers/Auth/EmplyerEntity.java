@@ -1,6 +1,4 @@
 package com.example.banksystem.Employers.Auth;
-
-
 import com.example.banksystem.Auth.AddressEntity;
 import com.example.banksystem.Auth.GenderEnums;
 import com.example.banksystem.Auth.UserEntity;
@@ -10,7 +8,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.util.Date;
 import java.util.List;
 

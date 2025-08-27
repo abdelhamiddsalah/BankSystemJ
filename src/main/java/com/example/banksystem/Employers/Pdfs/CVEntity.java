@@ -1,5 +1,6 @@
 package com.example.banksystem.Employers.Pdfs;
 
+import com.example.banksystem.Employers.Auth.EmplyerEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,5 +18,11 @@ public class CVEntity {
 
     private String file;
 
-    private String resultCv;
+    private String resultCv; // approved, rejected, waiting
+
+    private String copoun; // الحقول المتعلقة بالكوبون لو approved
+
+    @ManyToOne
+    @JoinColumn(name = "employer_id")
+    private EmplyerEntity employer;
 }

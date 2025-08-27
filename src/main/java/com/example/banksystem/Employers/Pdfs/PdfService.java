@@ -130,9 +130,25 @@ public class PdfService {
                 .orElseThrow(() -> new RuntimeException("CV not found"));
     }
 
-    public CVEntity updateCVResult(Long id, String result) {
+    public CVEntity updateCVResult(Long id, String result, String copoun) {
         CVEntity cv = getCVById(id);
-        cv.setResultCv(result);
+
+        // Normalize result
+        String status = result.trim().toLowerCase();
+        if (!status.equals("approved") && !status.equals("rejected")) {
+            status = "waiting";
+        }
+
+        cv.setResultCv(status);
+
+        // التعامل مع الكوبون
+        if (status.equals("approved")) {
+            cv.setCopoun(copoun); // حط الكوبون بس لو approved
+        } else {
+            cv.setCopoun(null); // لو rejected أو waiting ما يكونش فيه كوبون
+        }
+
         return cvRepo.save(cv);
     }
+
 }

@@ -2,6 +2,9 @@ package com.example.banksystem.Employers.Auth;
 
 import com.example.banksystem.Auth.*;
 import com.example.banksystem.Auth.CustomUserDetails;
+import com.example.banksystem.Common.Enums.Roles;
+import com.example.banksystem.Copouns.CopounEntity;
+import com.example.banksystem.Copouns.CopounsRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -24,13 +27,43 @@ public class EmployerService {
     @Autowired
     private EmployerMapper  employerMapper;
 
+    @Autowired
+    private CopounsRepo  copounsRepo;
+
     public EmployerAuthResponse sinup(EmployerDto employerDto) {
+        // التأكد من أن البريد غير مستخدم
         if (employerRepo.findByEmail(employerDto.getEmail()).isPresent()) {
             throw new ResponseStatusException(HttpStatus.FOUND, "Employee already exists with this email.");
         }
-      EmplyerEntity emplyerEntity = employerMapper.emplyerEntity(employerDto);
 
-        EmplyerEntity savedEmp= employerRepo.save(emplyerEntity);
+        // البحث عن الكوبون
+        CopounEntity copounEntity = copounsRepo.findByCopoun(employerDto.getEmplyeeID())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Copoun Not Found"));
+
+        if (copounEntity.getCopoun() == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Copoun Not Found");
+        }
+
+
+        if (copounEntity.isUsed() && copounEntity.isExpired()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Copoun Expired");
+        }
+
+        // تحويل DTO إلى Entity
+        EmplyerEntity emplyerEntity = employerMapper.emplyerEntity(employerDto);
+
+        // تعيين الدور الافتراضي إذا لم يتم تحديده
+        if (emplyerEntity.getRole() == null) {
+            emplyerEntity.setRole(Roles.EMPLOYER);
+        }
+
+        // حفظ الـ Employer
+        EmplyerEntity savedEmp = employerRepo.save(emplyerEntity);
+
+        // تحديث حالة الكوبون وحفظها في قاعدة البيانات
+        copounEntity.setUsed(true);
+        copounEntity.setExpired(true);
+        copounsRepo.save(copounEntity); // <--- مهم جداً
 
         // بناء UserDetails لتوليد التوكن
         UserDetails userDetails = new CustomUserDetails(
@@ -38,15 +71,15 @@ public class EmployerService {
                 savedEmp.getEmail(),
                 savedEmp.getPassword(),
                 Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + savedEmp.getRole().name())),
-               // savedEmp.getId(),
                 savedEmp.getPincode()
         );
+
         // توليد التوكن
         String token = jwtService.generateToken(userDetails);
 
-        return new EmployerAuthResponse(token,savedEmp.getRole().name());
-
+        return new EmployerAuthResponse(token, savedEmp.getRole().name());
     }
+
 
     EmployerAuthResponse login(EmployerDto employerDto) {
         // 1. نجيب الـ Employer من الداتابيز
