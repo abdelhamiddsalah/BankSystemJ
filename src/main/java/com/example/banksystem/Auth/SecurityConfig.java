@@ -45,7 +45,7 @@ public class SecurityConfig {
                                  "/api/admin/cvs",
                                 "/api/admin/cv/{id}/update",
                                 "/api/admin/allUsers",
-                                "/api/uploadpdf/upload-cv",
+                                "/api/upload-cv",
                                 "/configuration/ui",
                                 "/configuration/security",
                                 "/webjars/**"
