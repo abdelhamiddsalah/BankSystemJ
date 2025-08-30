@@ -22,6 +22,8 @@ public class CVEntity {
 
     private String copoun; // الحقول المتعلقة بالكوبون لو approved
 
+    private Double salary;
+
     @ManyToOne
     @JoinColumn(name = "employer_id")
     private EmplyerEntity employer;

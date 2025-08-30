@@ -1,17 +1,19 @@
 package com.example.banksystem.Employers.Auth;
 import com.example.banksystem.Common.Enums.Roles;
-import org.mapstruct.AfterMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.MappingTarget;
+import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-@Mapper(componentModel = "spring")
-public abstract class EmployerMapper {
+@Mapper(
+        componentModel = "spring",
+        unmappedTargetPolicy = ReportingPolicy.WARN,
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
+)public abstract class EmployerMapper {
      @Autowired
      protected PasswordEncoder passwordEncoder;
 
      // MapStruct هيتعامل مع باقي الحقول اللي ليها نفس الاسم تلقائياً
+     //@Mapping(target = "pdfFile", ignore = true)
      abstract EmplyerEntity emplyerEntity(EmployerDto employerDto);
      abstract EmployerDto employerDto(EmplyerEntity emplyerEntity);
 

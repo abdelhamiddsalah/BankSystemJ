@@ -20,7 +20,6 @@ public class EmplyerEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String firstName;
     private String lastName;
     private String email;
@@ -38,16 +37,17 @@ public class EmplyerEntity {
     private String MaterialStatus;
     @Enumerated(EnumType.STRING)
     private GenderEnums  Gender;
-
     @Enumerated(EnumType.STRING)
     private Roles role;
+
+   // @OneToMany(mappedBy = "employer", cascade = CascadeType.ALL)
+   // private List<UserEntity> users;
+
+    private String pincode;
+
 
     @OneToMany(mappedBy = "employer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PdfFileEntity> pdfFile;
 
-    @OneToMany(mappedBy = "employer", cascade = CascadeType.ALL)
-    private List<UserEntity> users;
-
-    private String pincode;
 
 }

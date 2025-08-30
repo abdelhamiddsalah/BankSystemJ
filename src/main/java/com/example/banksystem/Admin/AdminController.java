@@ -16,7 +16,7 @@ public class AdminController {
 
     @PostMapping("/registerAdmin")
     public String RegusterAsAdmin(@RequestBody AdminEntity adminEntity){
-      return    adminService.registerAsAdmin(adminEntity);
+      return  adminService.registerAsAdmin(adminEntity);
     }
 
     @GetMapping("/admin/allUsers")
@@ -37,5 +37,10 @@ public class AdminController {
     @DeleteMapping("/admin/user/{id}")
     public String deleteUser(@PathVariable Long id){
         return adminService.deleteUser(id);
+    }
+
+    @GetMapping("/admin/getEmployer/{id}")
+    public EmplyerEntity getEmplyer(@PathVariable Long id){
+        return adminService.getEmplyer(id);
     }
 }

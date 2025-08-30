@@ -1,35 +1,29 @@
-package com.example.banksystem.Auth;
+/*package com.example.banksystem.Auth;
 
-import com.example.banksystem.Employers.Auth.EmployerRepo;
-import com.example.banksystem.Employers.Auth.EmplyerEntity;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-@Mapper(componentModel = "spring")
+@Mapper(
+        componentModel = "spring",
+        unmappedTargetPolicy = ReportingPolicy.IGNORE, // 👈 علشان نتجنب التحذيرات
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
+)
 public abstract class UserMapper {
 
     @Autowired
     protected PasswordEncoder passwordEncoder;
 
-    @Autowired
-    protected EmployerRepo employerRepo;
-
-    //@Mapping(target = "employer", source = "employerId") // نحول من id إلى entity
+    // ✅ مش محتاجين نكتب @Mapping لكل حاجة
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "account", ignore = true)
+    @Mapping(target = "deposits", ignore = true)
     public abstract UserEntity toEntity(UserDto userDto);
 
     public abstract UserDto toDto(UserEntity userEntity);
 
-    // تحويل Long → EmplyerEntity
-    protected EmplyerEntity map(Long employerId) {
-        if (employerId == null) {
-            return null;
-        }
-        return employerRepo.findById(employerId).orElse(null);
-    }
-
     @AfterMapping
-    protected void afterMapping(UserDto dto, @MappingTarget UserEntity entity) {
+    protected void afterMappingToEntity(UserDto dto, @MappingTarget UserEntity entity) {
         if (dto.getPassword() != null && !dto.getPassword().isEmpty()) {
             entity.setPassword(passwordEncoder.encode(dto.getPassword()));
         }
@@ -37,4 +31,4 @@ public abstract class UserMapper {
             entity.setPinCode(passwordEncoder.encode(dto.getPinCode()));
         }
     }
-}
+}*/

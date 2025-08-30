@@ -2,12 +2,12 @@ package com.example.banksystem.Deposits;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static org.springframework.security.authorization.AuthorityReactiveAuthorizationManager.hasRole;
 
@@ -23,8 +23,12 @@ public class DepositController {
     @PostMapping("/createDeposit")
     @PreAuthorize("hasRole('USER')")
     public DepositResponseDto createDeposit(@RequestBody DepositDto depositdto) {
-        return depositService.CreateDeposit(depositdto); // ✅ كده تمام
+        return depositService.createDeposit(depositdto); // ✅ كده تمام
     }
 
-
+    @GetMapping("/all")
+   // @PreAuthorize("hasRole('EMPLOYER')")
+    public ResponseEntity<List<DepositEntity>> getAllDeposits() {
+        return depositService.GetAllDeposits();
+    }
 }

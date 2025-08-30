@@ -3,6 +3,7 @@ package com.example.banksystem.Deposits;
 
 import com.example.banksystem.Accountes.AccountEntity;
 import com.example.banksystem.Auth.UserEntity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,7 +25,9 @@ public class DepositEntity {
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JsonBackReference // 👈 تمنع Jackson من إعادة قراءة الـ user في كل مرة
     private UserEntity user;
+
 
 
     private LocalDateTime date;

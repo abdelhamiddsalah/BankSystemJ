@@ -43,10 +43,10 @@ public class PdfService {
         UserEntity user = userRepo.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        EmplyerEntity emp = user.getEmployer();
-        if (emp == null) {
-            throw new RuntimeException("This user is not assigned to any employer.");
-        }
+        //EmplyerEntity emp = user.getEmployer();
+       // if (emp == null) {
+           // throw new RuntimeException("This user is not assigned to any employer.");
+      //  }
 
         if (!multipartFile.getContentType().equals("application/pdf")) {
             throw new Exception("Only PDF files are allowed.");
@@ -57,13 +57,12 @@ public class PdfService {
         entity.setContentType(multipartFile.getContentType());
         entity.setData(multipartFile.getBytes());
         entity.setUser(user);
-        entity.setEmployer(user.getEmployer());
+     //   entity.setEmployer(user.getEmployer());
 
         pdfsRepo.save(entity);
         return "File uploaded successfully with ID: " + entity.getId();
     }
-
-
+    
     public List<PdfDto> findAll(){
         return pdfsRepo.findAll()
                 .stream()
@@ -130,7 +129,7 @@ public class PdfService {
                 .orElseThrow(() -> new RuntimeException("CV not found"));
     }
 
-    public CVEntity updateCVResult(Long id, String result, String copoun) {
+    public CVEntity updateCVResult(Long id, String result, String copoun,double salary) {
         CVEntity cv = getCVById(id);
 
         // Normalize result
@@ -140,12 +139,13 @@ public class PdfService {
         }
 
         cv.setResultCv(status);
-
         // التعامل مع الكوبون
         if (status.equals("approved")) {
             cv.setCopoun(copoun); // حط الكوبون بس لو approved
+            cv.setSalary(salary);
         } else {
             cv.setCopoun(null); // لو rejected أو waiting ما يكونش فيه كوبون
+            cv.setSalary(0.0);
         }
 
         return cvRepo.save(cv);

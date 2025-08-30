@@ -1,18 +1,12 @@
 package com.example.banksystem.Accountes;
-
-
 import com.example.banksystem.Auth.UserEntity;
-import com.example.banksystem.Deposits.DepositEntity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
+
 
 @Entity
 @Data
@@ -42,9 +36,6 @@ public class AccountEntity {
     private UserEntity user;
 
 
-    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DepositEntity> deposits;
-
-
-
+   // @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+   // private List<DepositEntity> deposits;
 }

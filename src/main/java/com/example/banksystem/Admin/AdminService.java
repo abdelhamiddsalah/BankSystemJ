@@ -62,7 +62,15 @@ public class AdminService {
                 userRepo.deleteById(usere.getId());
                 return "success";
             }
+        }
 
+        public EmplyerEntity getEmplyer(Long id) {
+        EmplyerEntity em = employerRepo.findById(id).get();
+        if (employerRepo.findById(em.getId()).isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No employer found");
+
+        }
+        return em;
         }
 
 }

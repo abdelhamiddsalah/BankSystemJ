@@ -24,7 +24,6 @@ public class CopounsService {
         }
         copounRepository.saveAll(oldCoupons);
 
-        // احفظ الكوبون الجديد
         copounEntity.setExpired(false);
         copounEntity.setUsed(false);
         return copounRepository.save(copounEntity);

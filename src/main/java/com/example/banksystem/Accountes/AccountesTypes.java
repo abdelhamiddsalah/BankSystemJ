@@ -1,5 +1,4 @@
 package com.example.banksystem.Accountes;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 

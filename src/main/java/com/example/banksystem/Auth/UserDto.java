@@ -1,11 +1,6 @@
 package com.example.banksystem.Auth;
 
 import com.example.banksystem.Common.Enums.Roles;
-import com.example.banksystem.Employers.Auth.EmplyerEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,6 +11,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDto {
+    private Long id;
     private String firstName;
     private String lastName;
     private String email;
@@ -25,8 +21,17 @@ public class UserDto {
     private String nationalId;
     private Date dateOfBirth;
     private String pinCode;
-    private AddressEntity address;   // من غير @Embedded
-    private GenderEnums gender;      // من غير @Enumerated
-    private String maritalStatus;    // خليه small camel case
-    private Long employerId;         // خليه مكتوب صح
+    private AddressEntity address;
+    private GenderEnums gender;
+    private String maritalStatus;
+   // private Long employerId; // ✅ موجود
+
+    // إضافة explicit getters/setters للتأكد من أن MapStruct يراها
+ //   public Long getEmployerId() {
+     //   return employerId;
+   // }
+
+    //public void setEmployerId(Long employerId) {
+    //    this.employerId = employerId;
+   // }
 }

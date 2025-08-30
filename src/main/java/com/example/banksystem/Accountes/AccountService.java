@@ -2,7 +2,7 @@ package com.example.banksystem.Accountes;
 import com.example.banksystem.Auth.JwtService;
 import com.example.banksystem.Auth.UserEntity;
 import com.example.banksystem.Auth.UserRepo;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -10,36 +10,64 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 
 @Service
-@RequiredArgsConstructor
+
 public class AccountService {
 
-    private final AccountsRepo accountsRepo;
-    private final AccountMapper accountMapper;
-    private final JwtService jwtService;
-    private final UserRepo   userRepo;
+    @Autowired
+    private  AccountsRepo accountsRepo;
 
+    @Autowired
+
+    private  JwtService jwtService;
+    @Autowired
+
+    private  UserRepo   userRepo;
     public AccountDto createAccount(AccountDto accountRequest) {
+        // 🛡️ 1. جِب الـ userId من التوكن
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String token = (String) authentication.getDetails();
         Long userId = jwtService.extractId(token);
 
+        // 🔍 2. تأكد إن المستخدم مش عامل حساب قبل كده
         if (accountsRepo.existsByUserId(userId)) {
-            AccountEntity existingAccount = accountsRepo.findByUserId(userId).orElseThrow();
-            return accountMapper.toDto(existingAccount);
+            throw new IllegalStateException("User already has an account.");
         }
 
-        UserEntity user = userRepo.findById(userId).orElseThrow();
-        AccountEntity entity = accountMapper.toEntity(accountRequest);
+        // 👤 3. جيب بيانات المستخدم من الـ DB
+        UserEntity user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        entity.setAccountNumber(generateAccountNumber());
-        entity.setAccountType(AccountesTypes.fromValue(String.valueOf(accountRequest.getAccountType())));
-        entity.setBalance(0.0);
-        entity.setCreatedAt(TimeUtil.getCurrentTime());
-        entity.setUser(user); // فقط اربط الحساب بالمستخدم
+        // 🏦 4. أنشئ AccountEntity جديد
+        AccountEntity entity = new AccountEntity();
+        entity.setBalance(accountRequest.getBalance() != 0.0 ? accountRequest.getBalance() : 0.0);
+        entity.setAccountType(accountRequest.getAccountType());
+        entity.setCreatedAt(LocalDateTime.now());
+        entity.setUser(user);
 
-        AccountEntity saved = accountsRepo.save(entity); // Hibernate هيعرف يربطهم صح
-        return accountMapper.toDto(saved);
+        // 🎲 5. توليد رقم حساب لو مش موجود
+        entity.setAccountNumber(
+                accountRequest.getAccountNumber() != null
+                        ? accountRequest.getAccountNumber()
+                        : generateAccountNumber()
+        );
+
+        // 💾 6. خزّن البيانات
+        AccountEntity saved = accountsRepo.save(entity);
+
+        // 🔄 7. رجّع DTO يدوي بدون Mapper
+        AccountDto response = new AccountDto();
+        response.setId(saved.getId());
+        response.setAccountType(saved.getAccountType());
+        response.setAccountNumber(saved.getAccountNumber());
+        response.setBalance(saved.getBalance());
+        response.setCreatedAt(saved.getCreatedAt());
+        response.setUserId(saved.getUser() != null ? saved.getUser().getId() : null);
+
+        return response;
     }
+
+
+
 
     public BalanceResponse getBalance() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

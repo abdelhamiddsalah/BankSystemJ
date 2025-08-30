@@ -14,9 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
-import java.util.Optional;
-
-import static org.springframework.boot.autoconfigure.container.ContainerImageMetadata.isPresent;
 
 @Service
 @RequiredArgsConstructor
@@ -25,15 +22,27 @@ public class UserService {
     private final UserRepo userRepo;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
-    private final EmployerRepo employerRepo;
-    private final UserMapper userMapper;
+
 
     public AuthResponse createUser(UserDto userDto) {
 
         if (userRepo.findByEmail(userDto.getEmail()).isPresent()) {
             throw new ResponseStatusException(HttpStatus.FOUND, "User already exists with this email.");
         }
-        UserEntity userEntity = userMapper.toEntity(userDto);
+        UserEntity userEntity = new UserEntity();
+        userEntity.setEmail(userDto.getEmail());
+        userEntity.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        userEntity.setGender(userDto.getGender());
+        userEntity.setMaritalStatus(userDto.getMaritalStatus());
+        userEntity.setAddress(userDto.getAddress());
+        userEntity.setDateOfBirth(userDto.getDateOfBirth());
+        userEntity.setPinCode(passwordEncoder.encode(userDto.getPinCode()));
+        userEntity.setNationalId(userDto.getNationalId());
+        userEntity.setRole(Roles.USER);
+        userEntity.setFirstName(userDto.getFirstName());
+        userEntity.setLastName(userDto.getLastName());
+        userEntity.setPhoneNumber(String.valueOf(userDto.getPhoneNumber()));
+
 
         if (userEntity.getRole() == null) {
             userEntity.setRole(Roles.USER);

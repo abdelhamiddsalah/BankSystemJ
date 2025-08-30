@@ -14,7 +14,6 @@ public class CopounsController {
 
     @PostMapping("/addcopoun")
     public CopounEntity AddCopoun(@RequestBody CopounEntity copounEntity) {
-
         return copounsService.addCopoun(copounEntity);
     }
 }

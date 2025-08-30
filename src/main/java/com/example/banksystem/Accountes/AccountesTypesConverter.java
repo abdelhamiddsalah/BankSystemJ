@@ -1,6 +1,4 @@
 package com.example.banksystem.Accountes;
-
-import com.example.banksystem.Accountes.AccountesTypes;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 

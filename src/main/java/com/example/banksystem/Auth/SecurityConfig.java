@@ -43,6 +43,7 @@ public class SecurityConfig {
                                 "/api/employee/signup",
                                 "/api/employee/login",
                                  "/api/admin/cvs",
+                                "/api/admin/getEmployer/{id}",
                                 "/api/admin/cv/{id}/update",
                                 "/api/admin/allUsers",
                                 "/api/admin/employer/{id}",
