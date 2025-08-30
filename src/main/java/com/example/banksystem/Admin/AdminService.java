@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AdminService {
@@ -72,6 +73,29 @@ public class AdminService {
         }
         return em;
         }
+
+    public List<EmplyerEntity> SearchEmplyer(String name) {
+        if (name == null || name.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "name Not Found");
+        }
+
+        List<EmplyerEntity> ems = employerRepo.findAll();
+        if (ems.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No employers found");
+        }
+
+        List<EmplyerEntity> filtered = ems.stream()
+                .filter(e -> e.getFirstName() != null && e.getFirstName().toLowerCase().contains(name.toLowerCase()))
+                .collect(Collectors.toList());
+
+        if (filtered.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Name not found");
+        }
+
+        return filtered;
+    }
+
+
 
 }
 

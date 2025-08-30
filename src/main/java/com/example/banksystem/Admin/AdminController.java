@@ -1,6 +1,7 @@
 package com.example.banksystem.Admin;
 
 import com.example.banksystem.Auth.UserEntity;
+import com.example.banksystem.Employers.Auth.EmployerDto;
 import com.example.banksystem.Employers.Auth.EmplyerEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -43,4 +44,11 @@ public class AdminController {
     public EmplyerEntity getEmplyer(@PathVariable Long id){
         return adminService.getEmplyer(id);
     }
+
+    @GetMapping("/admin/searchEmployers")
+    public List<EmplyerEntity> searchEmployer(@RequestParam String query) {
+        return adminService.SearchEmplyer(query);
+    }
+
+
 }

@@ -41,6 +41,7 @@ public class SecurityConfig {
                                 "/Categories",
                                 "/icons/**",
                                 "/api/employee/signup",
+                                  "/api/admin/searchEmployers",
                                 "/api/employee/login",
                                  "/api/admin/cvs",
                                 "/api/admin/getEmployer/{id}",

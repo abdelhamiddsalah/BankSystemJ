@@ -24,8 +24,6 @@ public class EmployerService {
     private JwtService jwtService;
     @Autowired
      private  PasswordEncoder passwordEncoder;
-    @Autowired
-    private EmployerMapper  employerMapper;
 
     @Autowired
     private CopounsRepo  copounsRepo;
@@ -50,7 +48,23 @@ public class EmployerService {
         }
 
         // تحويل DTO إلى Entity
-        EmplyerEntity emplyerEntity = employerMapper.emplyerEntity(employerDto);
+        EmplyerEntity emplyerEntity = new EmplyerEntity();
+        emplyerEntity.setId(employerDto.getId());
+        emplyerEntity.setFirstName(employerDto.getFirstName());
+        emplyerEntity.setLastName(employerDto.getLastName());
+        emplyerEntity.setEmail(employerDto.getEmail());
+        emplyerEntity.setPassword(passwordEncoder.encode(employerDto.getPassword()));
+        emplyerEntity.setRole(Roles.EMPLOYER);
+        emplyerEntity.setPincode(passwordEncoder.encode(employerDto.getPincode()));
+        emplyerEntity.setJobTitle(employerDto.getJobTitle());
+        emplyerEntity.setWorkBranch(employerDto.getWorkBranch());
+        emplyerEntity.setDateOfhiring(employerDto.getDateOfhiring());
+        emplyerEntity.setDepartment(employerDto.getDepartment());
+        emplyerEntity.setEmplyeeID(employerDto.getEmplyeeID());
+        emplyerEntity.setAddress(employerDto.getAddress());
+        emplyerEntity.setGender(employerDto.getGender());
+        emplyerEntity.setMaterialStatus(employerDto.getMaterialStatus());
+
 
         // تعيين الدور الافتراضي إذا لم يتم تحديده
         if (emplyerEntity.getRole() == null) {
