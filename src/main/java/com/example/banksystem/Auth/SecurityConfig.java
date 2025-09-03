@@ -27,6 +27,7 @@ public class SecurityConfig {
     private final JwtAuthFilter jwtAuthFilter;
 
     @Bean
+
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -34,16 +35,16 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/auth/**",
                                 "/api/register",
-                                "api/forgetpincode",
-                                "api/registerAdmin",
-                                "api/addcopoun",
+                                "/api/forgetpincode",
+                                "/api/registerAdmin",
+                                "/api/addcopoun",
                                 "/api/login",
                                 "/Categories",
                                 "/icons/**",
                                 "/api/employee/signup",
-                                  "/api/admin/searchEmployers",
+                                "/api/admin/searchEmployers",
                                 "/api/employee/login",
-                                 "/api/admin/cvs",
+                                "/api/admin/cvs",
                                 "/api/admin/getEmployer/{id}",
                                 "/api/admin/cv/{id}/update",
                                 "/api/admin/allUsers",
@@ -54,16 +55,15 @@ public class SecurityConfig {
                                 "/api/upload-cv",
                                 "/configuration/ui",
                                 "/configuration/security",
-                                "/webjars/**"
+                                "/webjars/**",
+                                "/uploads/**"              // 🔥 أضف هذا السطر
                         ).permitAll()
-
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/employer/**").hasRole("EMPLOYER")
                         .requestMatchers("/api/uploadpdf/view/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/uploadpdf").hasRole("USER")
                         .requestMatchers(HttpMethod.GET, "/api/uploadpdf").hasRole("EMPLOYER")
-                        .requestMatchers("/api/uploadpdf/view/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
@@ -72,6 +72,7 @@ public class SecurityConfig {
 
         return http.build();
     }
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {

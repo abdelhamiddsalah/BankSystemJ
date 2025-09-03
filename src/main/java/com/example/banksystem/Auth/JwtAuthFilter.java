@@ -46,7 +46,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 path.equals("/api/admin/cv/{id}") ||
                 path.startsWith("/auth") ||
                 path.startsWith("/webjars") ||
-                path.startsWith("/configuration")) {
+                path.startsWith("/icons/") ||
+
+        path.startsWith("/configuration")) {
 
             filterChain.doFilter(request, response);
             return;

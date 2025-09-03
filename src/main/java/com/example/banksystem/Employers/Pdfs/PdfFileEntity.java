@@ -27,6 +27,7 @@ public class PdfFileEntity {
 
     @ManyToOne
     private UserEntity user;
+    private String path; // ✅ رابط الملف
 
     @ManyToOne
     private EmplyerEntity employer;

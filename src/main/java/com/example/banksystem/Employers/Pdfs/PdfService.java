@@ -2,19 +2,13 @@ package com.example.banksystem.Employers.Pdfs;
 
 import com.example.banksystem.Admin.AdminEnums;
 import com.example.banksystem.Auth.JwtService;
-import com.example.banksystem.Auth.UserEntity;
 import com.example.banksystem.Auth.UserRepo;
 import com.example.banksystem.Copouns.CopounEntity;
 import com.example.banksystem.Copouns.CopounsRepo;
 import com.example.banksystem.Employers.Auth.EmployerRepo;
-import com.example.banksystem.Employers.Auth.EmplyerEntity;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -43,45 +37,59 @@ public class PdfService {
     private CopounsRepo copounrepo;
 
     public String uploadPdf(MultipartFile multipartFile) throws Exception {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String token = (String) authentication.getDetails();
-        Long userId = jwtService.extractId(token);
-
-        UserEntity user = userRepo.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        //EmplyerEntity emp = user.getEmployer();
-       // if (emp == null) {
-           // throw new RuntimeException("This user is not assigned to any employer.");
-      //  }
+        if (multipartFile.isEmpty()) {
+            throw new Exception("File is empty.");
+        }
 
         if (!multipartFile.getContentType().equals("application/pdf")) {
             throw new Exception("Only PDF files are allowed.");
         }
 
-        PdfFileEntity entity = new PdfFileEntity();
-        entity.setFileName(multipartFile.getOriginalFilename());
-        entity.setContentType(multipartFile.getContentType());
-        entity.setData(multipartFile.getBytes());
-        entity.setUser(user);
-     //   entity.setEmployer(user.getEmployer());
+        // ✅ اسم الملف
+        String fileName = System.currentTimeMillis() + "_" + multipartFile.getOriginalFilename();
 
+        // ✅ مسار الحفظ داخل static/uploads
+        String uploadDir = new File("src/main/resources/static/uploads").getAbsolutePath();
+
+        // ✅ تأكد أن الفولدر موجود
+        File directory = new File(uploadDir);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+
+        // ✅ إنشاء الملف وحفظه
+        File file = new File(directory, fileName);
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            fos.write(multipartFile.getBytes());
+        } catch (IOException e) {
+            throw new Exception("Error while saving the file.", e);
+        }
+
+        // ✅ هنا ممكن تحفظ في DB فقط اسم الملف (اختياري)
+        PdfFileEntity entity = new PdfFileEntity();
+        entity.setFileName(fileName);
+        entity.setContentType(multipartFile.getContentType());
+        entity.setPath("/uploads/" + fileName);
         pdfsRepo.save(entity);
-        return "File uploaded successfully with ID: " + entity.getId();
+
+        return "File uploaded successfully: /uploads/" + fileName;
     }
-    
-    public List<PdfDto> findAll(){
+
+
+
+    public List<PdfDto> findAll() {
         return pdfsRepo.findAll()
                 .stream()
                 .map(pdf -> new PdfDto(
                         pdf.getId(),
                         pdf.getFileName(),
                         pdf.getContentType(),
-                        "http://localhost:8080/api/uploadpdf/view/" + pdf.getId(),
-                        pdf.getEmployer().getEmplyeeID()
+                        "http://localhost:8080" + pdf.getPath(),
+                        pdf.getEmployer() != null ? pdf.getEmployer().getEmplyeeID() : null
                 ))
                 .collect(Collectors.toList());
     }
+
 
     public PdfFileEntity getPdfById(Long id) {
         return pdfsRepo.findById(id).orElseThrow(() -> new RuntimeException("PDF not found"));
@@ -101,7 +109,7 @@ public class PdfService {
         String fileName = System.currentTimeMillis() + "_" + multipartFile.getOriginalFilename();
 
         // ✅ مسار الحفظ
-        String uploadDir = "uploads/";
+        String uploadDir = "static/uploads/";
 
         // ✅ تأكد أن الفولدر موجود
         File directory = new File(uploadDir);
@@ -175,11 +183,5 @@ public class PdfService {
         return cvRepo.save(cv);
     }
 
-
-    public CVEntity getCvByid(Long id) {
-        return cvRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("CV not found"));
-
-    }
 
 }
