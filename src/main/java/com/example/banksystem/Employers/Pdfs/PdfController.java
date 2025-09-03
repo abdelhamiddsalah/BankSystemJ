@@ -44,7 +44,7 @@ public class PdfController {
     }
 
     @PostMapping("/upload-cv")
-    public String uploadCV(@RequestParam("file") MultipartFile file) throws Exception {
+    public CVResponse uploadCV(@RequestParam("file") MultipartFile file) throws Exception {
         return pdfService.uploadCV(file);
     }
 
@@ -77,5 +77,9 @@ public class PdfController {
         return pdfService.updateCVResult(id, status, copoun, salary);
     }
 
+    @GetMapping("admin/cv/{id}")
+    public CVEntity getCvById(@PathVariable Long id) {
+        return pdfService.getCVById(id);
+    }
 
 }

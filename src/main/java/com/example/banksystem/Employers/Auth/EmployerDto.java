@@ -1,15 +1,11 @@
 package com.example.banksystem.Employers.Auth;
-
 import com.example.banksystem.Auth.AddressEntity;
 import com.example.banksystem.Auth.GenderEnums;
 import com.example.banksystem.Common.Enums.Roles;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import com.example.banksystem.Employers.Pdfs.CVEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.util.Date;
 
 @Data
@@ -34,4 +30,5 @@ public class EmployerDto {
     private GenderEnums Gender;
     private Roles role;
     private String pincode;
+    private CVEntity Cvee;
 }

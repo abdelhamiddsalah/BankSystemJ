@@ -5,6 +5,8 @@ import com.example.banksystem.Auth.CustomUserDetails;
 import com.example.banksystem.Common.Enums.Roles;
 import com.example.banksystem.Copouns.CopounEntity;
 import com.example.banksystem.Copouns.CopounsRepo;
+import com.example.banksystem.Employers.Pdfs.CVEntity;
+import com.example.banksystem.Employers.Pdfs.CVRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -29,27 +31,26 @@ public class EmployerService {
     private CopounsRepo  copounsRepo;
 
     public EmployerAuthResponse sinup(EmployerDto employerDto) {
-        // التأكد من أن البريد غير مستخدم
         if (employerRepo.findByEmail(employerDto.getEmail()).isPresent()) {
             throw new ResponseStatusException(HttpStatus.FOUND, "Employee already exists with this email.");
         }
 
-        // البحث عن الكوبون
-        CopounEntity copounEntity = copounsRepo.findByCopoun(employerDto.getEmplyeeID())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Copoun Not Found"));
-
-        if (copounEntity.getCopoun() == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Copoun Not Found");
+        if (employerDto.getCvee() == null || employerDto.getCvee().getCopoun() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Copoun is required");
         }
 
+        // ✅ البحث عن الكوبون باستخدام الكوبون اللي في CV
+        CopounEntity copounEntity = copounsRepo.findByCopoun(employerDto.getCvee().getCopoun())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Copoun Not Found"));
 
-        if (copounEntity.isUsed() && copounEntity.isExpired()) {
+        if (copounEntity.isUsed()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Copoun Already Used");
+        }
+        if (copounEntity.isExpired()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Copoun Expired");
         }
 
-        // تحويل DTO إلى Entity
         EmplyerEntity emplyerEntity = new EmplyerEntity();
-        emplyerEntity.setId(employerDto.getId());
         emplyerEntity.setFirstName(employerDto.getFirstName());
         emplyerEntity.setLastName(employerDto.getLastName());
         emplyerEntity.setEmail(employerDto.getEmail());
@@ -60,26 +61,23 @@ public class EmployerService {
         emplyerEntity.setWorkBranch(employerDto.getWorkBranch());
         emplyerEntity.setDateOfhiring(employerDto.getDateOfhiring());
         emplyerEntity.setDepartment(employerDto.getDepartment());
-        emplyerEntity.setEmplyeeID(employerDto.getEmplyeeID());
+        emplyerEntity.setEmplyeeID(copounEntity.getCopoun()); // ✅ ربط الكوبون
         emplyerEntity.setAddress(employerDto.getAddress());
         emplyerEntity.setGender(employerDto.getGender());
         emplyerEntity.setMaterialStatus(employerDto.getMaterialStatus());
 
+        // ✅ ربط الـ CV بالـ Employer
+        CVEntity cv = employerDto.getCvee();
+        cv.setEmployer(emplyerEntity);
+        emplyerEntity.setCv(cv);
 
-        // تعيين الدور الافتراضي إذا لم يتم تحديده
-        if (emplyerEntity.getRole() == null) {
-            emplyerEntity.setRole(Roles.EMPLOYER);
-        }
-
-        // حفظ الـ Employer
         EmplyerEntity savedEmp = employerRepo.save(emplyerEntity);
 
-        // تحديث حالة الكوبون وحفظها في قاعدة البيانات
+        // ✅ نعلم الكوبون إنه مستخدم
         copounEntity.setUsed(true);
         copounEntity.setExpired(true);
-        copounsRepo.save(copounEntity); // <--- مهم جداً
+        copounsRepo.save(copounEntity);
 
-        // بناء UserDetails لتوليد التوكن
         UserDetails userDetails = new CustomUserDetails(
                 savedEmp.getId(),
                 savedEmp.getEmail(),
@@ -88,12 +86,10 @@ public class EmployerService {
                 savedEmp.getPincode()
         );
 
-        // توليد التوكن
         String token = jwtService.generateToken(userDetails);
 
         return new EmployerAuthResponse(token, savedEmp.getRole().name());
     }
-
 
     EmployerAuthResponse login(EmployerDto employerDto) {
         // 1. نجيب الـ Employer من الداتابيز

@@ -4,13 +4,17 @@ import com.example.banksystem.Admin.AdminEnums;
 import com.example.banksystem.Auth.JwtService;
 import com.example.banksystem.Auth.UserEntity;
 import com.example.banksystem.Auth.UserRepo;
+import com.example.banksystem.Copouns.CopounEntity;
+import com.example.banksystem.Copouns.CopounsRepo;
 import com.example.banksystem.Employers.Auth.EmployerRepo;
 import com.example.banksystem.Employers.Auth.EmplyerEntity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -34,6 +38,9 @@ public class PdfService {
 
     @Autowired
     private CVRepo cvRepo;
+
+    @Autowired
+    private CopounsRepo copounrepo;
 
     public String uploadPdf(MultipartFile multipartFile) throws Exception {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -80,7 +87,7 @@ public class PdfService {
         return pdfsRepo.findById(id).orElseThrow(() -> new RuntimeException("PDF not found"));
     }
 
-    public String uploadCV(MultipartFile multipartFile) throws Exception {
+    public CVResponse uploadCV(MultipartFile multipartFile) throws Exception {
         // ✅ تحقق من نوع الملف
         if (multipartFile.isEmpty()) {
             throw new Exception("File is empty.");
@@ -112,12 +119,18 @@ public class PdfService {
 
         // ✅ إنشاء CVEntity وحفظ البيانات
         CVEntity cvEntity = new CVEntity();
-        cvEntity.setFile(uploadDir + fileName); // أو بس fileName لو مش عايز الـfull path
+        cvEntity.setFile(uploadDir + fileName);
         cvEntity.setResultCv(AdminEnums.Waiting.toString());
         cvRepo.save(cvEntity);
 
-        return uploadDir + fileName;
+        // ✅ إنشاء CVResponse وإرجاعه
+        CVResponse response = new CVResponse();
+        response.setId(cvEntity.getId()); // ⬅️ رجّع نفس الـ ID
+
+        response.setCv(uploadDir + fileName);
+        return response;
     }
+
 
 
     public List<CVEntity> getAllCVs() {
@@ -129,26 +142,44 @@ public class PdfService {
                 .orElseThrow(() -> new RuntimeException("CV not found"));
     }
 
-    public CVEntity updateCVResult(Long id, String result, String copoun,double salary) {
+    // ✅ Service
+    public CVEntity updateCVResult(Long id, String result, String copoun, Double salary) {
         CVEntity cv = getCVById(id);
 
         // Normalize result
-        String status = result.trim().toLowerCase();
+        String status = (result == null || result.isBlank()) ? "waiting" : result.trim().toLowerCase();
         if (!status.equals("approved") && !status.equals("rejected")) {
             status = "waiting";
         }
-
         cv.setResultCv(status);
-        // التعامل مع الكوبون
-        if (status.equals("approved")) {
-            cv.setCopoun(copoun); // حط الكوبون بس لو approved
-            cv.setSalary(salary);
+
+        if ("approved".equals(status)) {
+            // ✅ إنشاء كوبون جديد
+            if (copoun != null && !copoun.isBlank()) {
+                CopounEntity newCopoun = new CopounEntity();
+                newCopoun.setCopoun(copoun);
+                newCopoun.setUsed(false);
+                newCopoun.setExpired(false);
+
+                copounrepo.save(newCopoun); // حفظ الكوبون الجديد
+
+                cv.setCopoun(copoun); // حفظ الكوبون في الـ CV
+            }
+
+            cv.setSalary(salary != null ? salary : 0.0);
         } else {
-            cv.setCopoun(null); // لو rejected أو waiting ما يكونش فيه كوبون
+            cv.setCopoun(null);
             cv.setSalary(0.0);
         }
 
         return cvRepo.save(cv);
+    }
+
+
+    public CVEntity getCvByid(Long id) {
+        return cvRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("CV not found"));
+
     }
 
 }

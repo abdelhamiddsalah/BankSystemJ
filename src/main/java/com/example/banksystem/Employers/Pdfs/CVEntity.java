@@ -20,7 +20,8 @@ public class CVEntity {
 
     private String resultCv; // approved, rejected, waiting
 
-    private String copoun; // الحقول المتعلقة بالكوبون لو approved
+    @Column(unique = true)
+    private String copoun;
 
     private Double salary;
 
