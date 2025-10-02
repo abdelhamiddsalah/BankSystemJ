@@ -1,5 +1,6 @@
 package com.example.banksystem.Auth;
 import com.example.banksystem.Accountes.AccountEntity;
+import com.example.banksystem.Common.Enums.GenderEnums;
 import com.example.banksystem.Common.Enums.Roles;
 import com.example.banksystem.Deposits.DepositEntity;
 import com.fasterxml.jackson.annotation.JsonManagedReference;

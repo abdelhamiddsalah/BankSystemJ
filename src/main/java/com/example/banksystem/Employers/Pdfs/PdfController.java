@@ -27,7 +27,7 @@ public class PdfController {
 
     }
 
-    @GetMapping
+    @GetMapping("/allpdfs")
     @PreAuthorize("hasRole('EMPLOYER')")
     public List<PdfDto> findAll(){
         return pdfService.findAll();

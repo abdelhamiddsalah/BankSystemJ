@@ -29,29 +29,19 @@ public class CustomUserDetailsService implements UserDetailsService {
             GrantedAuthority authority = new SimpleGrantedAuthority(role);
 
             return new CustomUserDetails(
-                    user.getId(),
-                    user.getEmail(),
-                    user.getPassword(),
-                    Collections.singletonList(authority),
-                 //   user.getEmployer().getId(),
-                    user.getPinCode()
+                  user
             );
         }
 
         // Try employer
-        var employerOpt = employerRepo.findByEmail(email);
+        var employerOpt = employerRepo.findByUser_Email(email);
         if (employerOpt.isPresent()) {
             EmplyerEntity employer = employerOpt.get();
-            String role = "ROLE_" + employer.getRole().name();
+            String role = "ROLE_" + employer.getUser().getRole().name();
             GrantedAuthority authority = new SimpleGrantedAuthority(role);
 
             return new CustomUserDetails(
-                    employer.getId(),
-                    employer.getEmail(),
-                    employer.getPassword(),
-                    Collections.singletonList(authority),
-                    //employer.getId(),
-                    employer.getPincode()
+                employer.getUser()
             );
         }
 

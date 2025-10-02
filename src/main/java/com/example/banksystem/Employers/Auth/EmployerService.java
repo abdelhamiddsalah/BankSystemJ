@@ -31,7 +31,7 @@ public class EmployerService {
     private CopounsRepo  copounsRepo;
 
     public EmployerAuthResponse sinup(EmployerDto employerDto) {
-        if (employerRepo.findByEmail(employerDto.getEmail()).isPresent()) {
+        if (employerRepo.findByUser_Email(employerDto.getUser().getEmail()).isPresent()) {
             throw new ResponseStatusException(HttpStatus.FOUND, "Employee already exists with this email.");
         }
 
@@ -50,55 +50,59 @@ public class EmployerService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Copoun Expired");
         }
 
+        // 1. إنشاء UserEntity جديد
+        UserEntity userEntity = new UserEntity();
+        userEntity.setFirstName(employerDto.getUser().getFirstName());
+        userEntity.setLastName(employerDto.getUser().getLastName());
+        userEntity.setEmail(employerDto.getUser().getEmail());
+        userEntity.setPassword(passwordEncoder.encode(employerDto.getUser().getPassword()));
+        userEntity.setRole(Roles.EMPLOYER);
+        userEntity.setPinCode(passwordEncoder.encode(employerDto.getUser().getPinCode()));
+        userEntity.setAddress(employerDto.getUser().getAddress());
+        userEntity.setGender(employerDto.getUser().getGender());
+        userEntity.setMaritalStatus(employerDto.getUser().getMaritalStatus());
+
+// 2. إنشاء EmployerEntity وربطه بالـ UserEntity
         EmplyerEntity emplyerEntity = new EmplyerEntity();
-        emplyerEntity.setFirstName(employerDto.getFirstName());
-        emplyerEntity.setLastName(employerDto.getLastName());
-        emplyerEntity.setEmail(employerDto.getEmail());
-        emplyerEntity.setPassword(passwordEncoder.encode(employerDto.getPassword()));
-        emplyerEntity.setRole(Roles.EMPLOYER);
-        emplyerEntity.setPincode(passwordEncoder.encode(employerDto.getPincode()));
+        emplyerEntity.setUser(userEntity); // ✅ هنا لازم قبل أي save
         emplyerEntity.setJobTitle(employerDto.getJobTitle());
         emplyerEntity.setWorkBranch(employerDto.getWorkBranch());
         emplyerEntity.setDateOfhiring(employerDto.getDateOfhiring());
         emplyerEntity.setDepartment(employerDto.getDepartment());
-        emplyerEntity.setEmplyeeID(copounEntity.getCopoun()); // ✅ ربط الكوبون
-        emplyerEntity.setAddress(employerDto.getAddress());
-        emplyerEntity.setGender(employerDto.getGender());
-        emplyerEntity.setMaterialStatus(employerDto.getMaterialStatus());
+        emplyerEntity.setEmplyeeID(copounEntity.getCopoun());
 
-        // ✅ ربط الـ CV بالـ Employer
+// 3. ربط الـ CV بالـ Employer
         CVEntity cv = employerDto.getCvee();
         cv.setEmployer(emplyerEntity);
         emplyerEntity.setCv(cv);
 
+// 4. حفظ الـ Employer (مع الـ User بسبب الـ Cascade)
         EmplyerEntity savedEmp = employerRepo.save(emplyerEntity);
+
 
         // ✅ نعلم الكوبون إنه مستخدم
         copounEntity.setUsed(true);
         copounEntity.setExpired(true);
         copounsRepo.save(copounEntity);
 
-        UserDetails userDetails = new CustomUserDetails(
-                savedEmp.getId(),
-                savedEmp.getEmail(),
-                savedEmp.getPassword(),
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + savedEmp.getRole().name())),
-                savedEmp.getPincode()
+        CustomUserDetails userDetails = new CustomUserDetails(
+                savedEmp.getUser()   // هنا بتمرر UserEntity اللي مربوط بـ Employer
         );
+
 
         String token = jwtService.generateToken(userDetails);
 
-        return new EmployerAuthResponse(token, savedEmp.getRole().name());
+        return new EmployerAuthResponse(token, savedEmp.getUser().getRole().name());
     }
 
     EmployerAuthResponse login(EmployerDto employerDto) {
         // 1. نجيب الـ Employer من الداتابيز
-        EmplyerEntity emplyerEntity = employerRepo.findByEmail(employerDto.getEmail())
+        EmplyerEntity emplyerEntity = employerRepo.findByUser_Email(employerDto.getUser().getEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("Email not found"));
 
         // 2. نجيب القيمتين
-        String enteredPin = employerDto.getPincode();   // اللي المستخدم دخلها
-        String storedPin = emplyerEntity.getPincode();  // اللي في الداتا بيز (مشفر)
+        String enteredPin = employerDto.getUser().getPinCode();   // اللي المستخدم دخلها
+        String storedPin = emplyerEntity.getUser().getPinCode();  // اللي في الداتا بيز (مشفر)
 
         // 3. نتحقق باستخدام PasswordEncoder
         if (!passwordEncoder.matches(enteredPin, storedPin)) {
@@ -106,17 +110,14 @@ public class EmployerService {
         }
 
         // 4. لو صح، نكمل تسجيل الدخول
-        UserDetails userDetails = new CustomUserDetails(
-                emplyerEntity.getId(),
-                emplyerEntity.getEmail(),
-                emplyerEntity.getPassword(),
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + emplyerEntity.getRole().name())),
-                emplyerEntity.getPincode()
+        CustomUserDetails userDetails = new CustomUserDetails(
+                emplyerEntity.getUser()   // هنا بتمرر UserEntity اللي مربوط بـ Employer
+
         );
 
         String token = jwtService.generateToken(userDetails);
 
-        return new EmployerAuthResponse(token, emplyerEntity.getRole().name());
+        return new EmployerAuthResponse(token, emplyerEntity.getUser().getRole().name());
     }
 
 }

@@ -19,8 +19,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity
 @RequiredArgsConstructor
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
@@ -48,7 +48,7 @@ public class SecurityConfig {
                                 "/api/admin/getEmployer/{id}",
                                 "/api/admin/cv/{id}/update",
                                 "/api/admin/allUsers",
-                                "/api/admin/cv/{id}",
+                                "/api/admin/cv/**",
                                 "/api/admin/employer/{id}",
                                 "/api/admin/user/{id}",
                                 "/api/admin/allEmployers",
@@ -58,7 +58,7 @@ public class SecurityConfig {
                                 "/webjars/**",
                                 "/uploads/**"              // 🔥 أضف هذا السطر
                         ).permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                       // .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/employer/**").hasRole("EMPLOYER")
                         .requestMatchers("/api/uploadpdf/view/**").permitAll()
@@ -80,15 +80,15 @@ public class SecurityConfig {
     }
 
     @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+
+    @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(userDetailsService);
         provider.setPasswordEncoder(passwordEncoder());
         return provider;
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
     }
 }

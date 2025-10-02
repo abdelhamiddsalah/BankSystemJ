@@ -1,5 +1,7 @@
-package com.example.banksystem.Auth;
+package com.example.banksystem.Clients;
 
+import com.example.banksystem.Auth.AuthResponse;
+import com.example.banksystem.Auth.NewPincode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -9,18 +11,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
-public class UserController {
+public class ClientController {
 
     @Autowired
-    private UserService userService;
+    private ClientService userService;
 
     @PostMapping("/register")
-    public AuthResponse createUser(@RequestBody UserDto userDto) {
-        return userService.createUser(userDto);
+    public ResponseEntity<?> createUser(@RequestBody ClientDto userDto)
+    {
+        return  ResponseEntity.ok(userService.createUser(userDto));
     }
 
     @PostMapping("/login")
-    public AuthResponse login(@RequestBody UserDto userDto) {
+    public AuthResponse login(@RequestBody ClientDto userDto) {
         return userService.loginWithPin(userDto);
     }
 

@@ -84,7 +84,7 @@ public class AdminService {
         }
 
         List<EmplyerEntity> filtered = ems.stream()
-                .filter(e -> e.getFirstName() != null && e.getFirstName().toLowerCase().contains(name.toLowerCase()))
+                .filter(e -> e.getUser().getFirstName() != null && e.getUser().getFirstName().toLowerCase().contains(name.toLowerCase()))
                 .collect(Collectors.toList());
 
         if (filtered.isEmpty()) {

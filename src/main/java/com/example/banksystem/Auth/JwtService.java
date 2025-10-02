@@ -22,15 +22,13 @@ public class JwtService {
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateToken(UserDetails userDetails) {
-        if (!(userDetails instanceof CustomUserDetails customUser)) {
-            throw new IllegalArgumentException("Expected CustomUserDetails but got: " + userDetails.getClass());
-        }
+    public String generateToken(CustomUserDetails userDetails) {
 
         return Jwts.builder()
-                .setSubject(customUser.getUsername())
-                .claim("id", customUser.getId()) // userId
-                .claim("roles", customUser.getAuthorities())
+                .setSubject(userDetails.getUsername())
+                .claim("id", userDetails.getId()) // userId
+                .claim("roles", userDetails.getAuthorities())
+                .claim("email", userDetails.getEmail())
                 // .claim("employerId", customUser.getEmployerId()) // ✅ هنا الإضافة الجديدة
                 .setIssuedAt(new Date())
                 .setExpiration(Date.from(Instant.now().plus(1, ChronoUnit.DAYS)))
@@ -80,6 +78,5 @@ public class JwtService {
                 .getExpiration();
         return expiration.before(new Date());
     }
-
 
 }

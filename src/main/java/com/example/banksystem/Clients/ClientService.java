@@ -1,13 +1,10 @@
-package com.example.banksystem.Auth;
+package com.example.banksystem.Clients;
 
+import com.example.banksystem.Auth.*;
 import com.example.banksystem.Common.Enums.Roles;
-import com.example.banksystem.Employers.Auth.EmployerRepo;
-import com.example.banksystem.Employers.Auth.EmplyerEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,69 +14,55 @@ import java.util.Collections;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class ClientService {
 
     private final UserRepo userRepo;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
 
-    public AuthResponse createUser(UserDto userDto) {
+    public AuthResponse createUser(ClientDto userDto) {
 
-        if (userRepo.findByEmail(userDto.getEmail()).isPresent()) {
+        if (userRepo.findByEmail(userDto.getUser().getEmail()).isPresent()) {
             throw new ResponseStatusException(HttpStatus.FOUND, "User already exists with this email.");
         }
         UserEntity userEntity = new UserEntity();
-        userEntity.setEmail(userDto.getEmail());
-        userEntity.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        userEntity.setGender(userDto.getGender());
-        userEntity.setMaritalStatus(userDto.getMaritalStatus());
-        userEntity.setAddress(userDto.getAddress());
-        userEntity.setDateOfBirth(userDto.getDateOfBirth());
-        userEntity.setPinCode(passwordEncoder.encode(userDto.getPinCode()));
-        userEntity.setNationalId(userDto.getNationalId());
+        userEntity.setEmail(userDto.getUser().getEmail());
+        userEntity.setPassword(passwordEncoder.encode(userDto.getUser().getPassword()));
+        userEntity.setGender(userDto.getUser().getGender());
+        userEntity.setMaritalStatus(userDto.getUser().getMaritalStatus());
+        userEntity.setAddress(userDto.getUser().getAddress());
+        userEntity.setDateOfBirth(userDto.getUser().getDateOfBirth());
+        userEntity.setPinCode(passwordEncoder.encode(userDto.getUser().getPinCode()));
+        userEntity.setNationalId(userDto.getUser().getNationalId());
         userEntity.setRole(Roles.USER);
-        userEntity.setFirstName(userDto.getFirstName());
-        userEntity.setLastName(userDto.getLastName());
-        userEntity.setPhoneNumber(String.valueOf(userDto.getPhoneNumber()));
-
-
-        if (userEntity.getRole() == null) {
-            userEntity.setRole(Roles.USER);
-        }
+        userEntity.setFirstName(userDto.getUser().getFirstName());
+        userEntity.setLastName(userDto.getUser().getLastName());
+        userEntity.setPhoneNumber(String.valueOf(userDto.getUser().getPhoneNumber()));
 
         UserEntity savedUser = userRepo.save(userEntity);
 
-        UserDetails userDetails = new CustomUserDetails(
-                savedUser.getId(),
-                savedUser.getEmail(),
-                savedUser.getPassword(),
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + savedUser.getRole().name())),
-                savedUser.getPinCode()
+        CustomUserDetails userDetails = new CustomUserDetails(
+            userEntity
         );
         String token = jwtService.generateToken(userDetails);
         return new AuthResponse(token, savedUser.getRole().name());
     }
 
 
-    public AuthResponse loginWithPin(UserDto userDto) {
+    public AuthResponse loginWithPin(ClientDto userDto) {
         // 1. نبحث بالمُعرّف (إيميل أو هاتف)
-        UserEntity user = userRepo.findByEmail(userDto.getEmail())
+        UserEntity user = userRepo.findByEmail(userDto.getUser().getEmail())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         // 2. نتحقق من الـ PIN
-        if (!passwordEncoder.matches(userDto.getPinCode(), user.getPinCode())) {
+        if (!passwordEncoder.matches(userDto.getUser().getPinCode(), user.getPinCode())) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid PIN");
         }
 
         // 3. توليد الـ JWT
-        UserDetails userDetails = new CustomUserDetails(
-                user.getId(),
-                user.getEmail(),
-                user.getPassword(),
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole().name())),
-            //    user.getEmployer() != null ? user.getEmployer().getId() : null,
-                user.getPinCode()
+        CustomUserDetails userDetails = new CustomUserDetails(
+               user
         );
 
         String token = jwtService.generateToken(userDetails);
