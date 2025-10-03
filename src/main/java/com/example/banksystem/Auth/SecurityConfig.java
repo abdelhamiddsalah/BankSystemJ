@@ -55,13 +55,18 @@ public class SecurityConfig {
                                 "/api/upload-cv",
                                 "/configuration/ui",
                                 "/configuration/security",
+                                "/api/employee/forgetPassword",
                                 "/webjars/**",
+                                "/test-view/**",
                                 "/uploads/**"              // 🔥 أضف هذا السطر
                         ).permitAll()
                        // .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/employer/**").hasRole("EMPLOYER")
                         .requestMatchers("/api/uploadpdf/view/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/Employer/reset-password-form/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/Employer/reset-password").permitAll()
+
                         .requestMatchers(HttpMethod.POST, "/api/uploadpdf").hasRole("USER")
                         .requestMatchers(HttpMethod.GET, "/api/uploadpdf").hasRole("EMPLOYER")
                         .anyRequest().authenticated()

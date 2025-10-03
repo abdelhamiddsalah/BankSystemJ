@@ -3,6 +3,7 @@ import com.example.banksystem.Accountes.AccountEntity;
 import com.example.banksystem.Common.Enums.GenderEnums;
 import com.example.banksystem.Common.Enums.Roles;
 import com.example.banksystem.Deposits.DepositEntity;
+import com.example.banksystem.Employers.Auth.EmplyerEntity;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -48,9 +49,9 @@ public class UserEntity  {
     private GenderEnums gender;
     @Column(name = "marital_status")
     private String maritalStatus;
-    //@ManyToOne
-  //  @JoinColumn(name = "employer_id")
-  //  private EmplyerEntity employer;
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private EmplyerEntity employer;
+
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private AccountEntity account;

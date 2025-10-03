@@ -9,6 +9,7 @@ import com.example.banksystem.Employers.Pdfs.CVEntity;
 import com.example.banksystem.Employers.Pdfs.CVRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
+import java.util.UUID;
 
 @Service
 public class EmployerService {
@@ -29,6 +31,12 @@ public class EmployerService {
 
     @Autowired
     private CopounsRepo  copounsRepo;
+
+    @Autowired
+    private EmailService emailService;
+
+    @Autowired
+    private UserRepo userRepo;
 
     public EmployerAuthResponse sinup(EmployerDto employerDto) {
         if (employerRepo.findByUser_Email(employerDto.getUser().getEmail()).isPresent()) {
@@ -61,22 +69,25 @@ public class EmployerService {
         userEntity.setAddress(employerDto.getUser().getAddress());
         userEntity.setGender(employerDto.getUser().getGender());
         userEntity.setMaritalStatus(employerDto.getUser().getMaritalStatus());
+        userEntity = userRepo.save(userEntity);  // دلوقتي واخد ID
 
 // 2. إنشاء EmployerEntity وربطه بالـ UserEntity
         EmplyerEntity emplyerEntity = new EmplyerEntity();
-        emplyerEntity.setUser(userEntity); // ✅ هنا لازم قبل أي save
+        emplyerEntity.setUser(userEntity);
+        userEntity.setEmployer(emplyerEntity);
+
         emplyerEntity.setJobTitle(employerDto.getJobTitle());
         emplyerEntity.setWorkBranch(employerDto.getWorkBranch());
         emplyerEntity.setDateOfhiring(employerDto.getDateOfhiring());
         emplyerEntity.setDepartment(employerDto.getDepartment());
         emplyerEntity.setEmplyeeID(copounEntity.getCopoun());
 
-// 3. ربط الـ CV بالـ Employer
+// ربط الـ CV
         CVEntity cv = employerDto.getCvee();
         cv.setEmployer(emplyerEntity);
         emplyerEntity.setCv(cv);
 
-// 4. حفظ الـ Employer (مع الـ User بسبب الـ Cascade)
+// الحفظ
         EmplyerEntity savedEmp = employerRepo.save(emplyerEntity);
 
 
@@ -98,15 +109,16 @@ public class EmployerService {
     EmployerAuthResponse login(EmployerDto employerDto) {
         // 1. نجيب الـ Employer من الداتابيز
         EmplyerEntity emplyerEntity = employerRepo.findByUser_Email(employerDto.getUser().getEmail())
-                .orElseThrow(() -> new UsernameNotFoundException("Email not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Email not found"));
+
 
         // 2. نجيب القيمتين
-        String enteredPin = employerDto.getUser().getPinCode();   // اللي المستخدم دخلها
-        String storedPin = emplyerEntity.getUser().getPinCode();  // اللي في الداتا بيز (مشفر)
+        String enteredPin = employerDto.getUser().getPassword();   // اللي المستخدم دخلها
+        String storedPin = emplyerEntity.getUser().getPassword();  // اللي في الداتا بيز (مشفر)
 
         // 3. نتحقق باستخدام PasswordEncoder
         if (!passwordEncoder.matches(enteredPin, storedPin)) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid PIN");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid Password");
         }
 
         // 4. لو صح، نكمل تسجيل الدخول
@@ -118,6 +130,34 @@ public class EmployerService {
         String token = jwtService.generateToken(userDetails);
 
         return new EmployerAuthResponse(token, emplyerEntity.getUser().getRole().name());
+    }
+
+    public ResponseEntity<?> forgetPassword(EmployerDto employerDto) {
+        EmplyerEntity emp = employerRepo.findByUser_Email(employerDto.getUser().getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String token = UUID.randomUUID().toString();
+
+        // خزّن التوكن عند المدرس
+        emp.setResetToken(token);
+        employerRepo.save(emp);
+        String resetLink = "http://localhost:8080/api/Employer/reset-password-form?token=" + token;
+        emailService.sendPasswordResetEmail(employerDto.getUser().getEmail(), resetLink);
+
+        return ResponseEntity.ok("Password reset link has been sent successfully to your email.");
+    }
+
+    public ResponseEntity<?> resetPassword(String token, String newPassword) {
+        // هنا محتاج تربط التوكن باليوزر
+        // في البداية ممكن تخزن التوكن في Map أو DB مع الـ email
+
+        EmplyerEntity emp = employerRepo.findByResetToken(token) // مثال
+                .orElseThrow(() -> new RuntimeException("token not found"));
+
+        // غير الباسورد
+        emp.getUser().setPassword(passwordEncoder.encode(newPassword));
+
+        return ResponseEntity.ok("Password has been reset successfully");
     }
 
 }

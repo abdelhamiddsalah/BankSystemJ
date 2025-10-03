@@ -8,6 +8,6 @@ import java.util.Optional;
 @Repository
 public interface EmployerRepo extends JpaRepository<EmplyerEntity, Long> {
   Optional<EmplyerEntity> findByUser_Email(String email);
-
+  Optional<EmplyerEntity> findByResetToken(String token);
   Optional<EmplyerEntity> findById(Long id);
 }

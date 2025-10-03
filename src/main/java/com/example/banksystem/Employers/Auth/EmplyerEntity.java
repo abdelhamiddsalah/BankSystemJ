@@ -21,9 +21,10 @@ public class EmplyerEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true) // ✅ هنا Cascade ALL مهم جدًا
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @OneToOne
+    @JoinColumn(name = "user_id")
     private UserEntity user;
+
 
 
     private String emplyeeID;
@@ -38,4 +39,7 @@ public class EmplyerEntity {
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private CVEntity cv;
+
+    @Column(name = "reset_token")
+    private String resetToken;
 }
